@@ -19,7 +19,7 @@ int main() {
     rv32i_model::Processor pr(64);
     pr.load_input_to_memory(in);
 
-   // pr.process();
+    pr.process();
 
     return 0;
 }

@@ -42,19 +42,43 @@ public:
     }
 
     int32_t& operator[](std::size_t i) & { return mem[i]; }
+
+    std::size_t inst_number() { return mem.size(); };
 };
 
 
 class Processor final {
     Regfile regfile;
     Memory memory;
-    int32_t& pc; //hmm...
+    int PC;
 public:
-    Processor(std::size_t memory_size) : regfile(), memory(memory_size) {}
+    Processor(std::size_t memory_size) : regfile(), memory(memory_size), PC(-1) {}
 
     void load_input_to_memory(auto && data) {
         memory = std::move(data);
-        pc = memory[0];
+        PC = 0;
+    }
+
+    int32_t& fetch() {
+        int32_t& inst = memory[PC];
+        PC++;
+        return inst;
+    }
+
+    void decode() {
+
+    }
+
+    void execute() {
+
+    }
+
+    void process() {
+        while(PC >= 0 && PC < memory.inst_number()) {
+            int32_t& inst = fetch();
+            std::cout << inst << " ";;
+        }
+        std::cout << std::endl;
     }
 
 };
