@@ -16,6 +16,7 @@ in all formats to simplify decoding.*/
 #include <array>
 #include <vector>
 #include <cassert>
+#include "instruction.hpp"
 
 
 namespace rv32i_model {
@@ -43,14 +44,14 @@ public:
 
     int32_t& operator[](std::size_t i) & { return mem[i]; }
 
-    std::size_t inst_number() { return mem.size(); };
+    std::size_t inst_size() { return mem.size(); };
 };
 
 
 class Processor final {
     Regfile regfile;
     Memory memory;
-    int PC;
+    std::size_t PC;
 public:
     Processor(std::size_t memory_size) : regfile(), memory(memory_size), PC(-1) {}
 
@@ -65,18 +66,26 @@ public:
         return inst;
     }
 
-    void decode() {
+    inst_t decode(int32_t& inst) {
+        //применение масок
+        int opcode = inst & 0x7F;
+        int rd = (inst >> 7) & 0x1F;
+        int rs1 = (inst >> 15) & 0x1F;
+        int rs2 = (inst >> 20) & 0x1F;
+        int funct3 = (inst >> 12) & 0x7;
+        int funct7 = (inst >> 25) & 0x7F;
 
+        return inst_t(opcode, rd, rs1, rs2, funct3, funct7);
     }
 
-    void execute() {
-
-    }
+    void execute() {}
 
     void process() {
-        while(PC >= 0 && PC < memory.inst_number()) {
+        std::size_t inst_number = memory.inst_size();
+        while(PC >= 0 && PC < inst_number) {
             int32_t& inst = fetch();
-            std::cout << inst << " ";;
+            auto[opc, rd, rs1, rs2, funct3, funct7] = decode(inst);
+            std::cout << inst << " ";
         }
         std::cout << std::endl;
     }
