@@ -42,6 +42,25 @@ void Processor::execute(inst_d dec_inst) {
             execute_op(funct7, rs2, rs1, funct3, rd);
             break;
         case Opcode::JAL:
+            execute_jal(funct7, rs2, rs1, funct3, rd);
+            break;
+        case Opcode::JALR:
+            execute_jalr(funct7, rs2, rs1, funct3, rd);
+            break;
+        case Opcode::BRANCH:
+            execute_branch(funct7, rs2, rs1, funct3, rd);
+            break;
+        case Opcode::LOAD:
+            execute_load(funct7, rs2, rs1, funct3, rd);
+            break;
+        case Opcode::STORE:
+            execute_store(funct7, rs2, rs1, funct3, rd);
+            break;
+        case Opcode::SYSTEM:
+            execute_system(funct7, rs2, rs1, funct3, rd);
+            break;
+        case Opcode::FENCE:
+            execute_fence(funct7, rs2, rs1, funct3, rd);
             break;
         default:
             break;
@@ -51,8 +70,12 @@ void Processor::execute(inst_d dec_inst) {
 void Processor::execute_op_imm(unsigned int funct7, unsigned int rs2, \
                             unsigned int rs1, unsigned int funct3, unsigned int rd) {
     switch (static_cast<Funct3>(funct3)) {
-        case Funct3::VAR_1:
-            //addi
+        case Funct3::VAR_1: //addi
+            unsigned int imm = (funct7 << 5) + rs2;
+            regfile.write(rd, imm + regfile.read(rs1));
+            break;
+        default:
+            throw std::runtime_error ("Unknown instruction");
             break;
     }
 }
@@ -70,12 +93,12 @@ void Processor::execute_op(unsigned int funct7, unsigned int rs2, \
                     regfile.write(rd, regfile.read(rs1) - regfile.read(rs2));
                     break;
                 default:
-                    //throw;
+                    throw std::runtime_error ("Unknown instruction");
                     break;
             }
             break;
         default:
-            //throw;
+            throw std::runtime_error ("Unknown instruction");
             break;
     }
 }
@@ -83,11 +106,15 @@ void Processor::execute_op(unsigned int funct7, unsigned int rs2, \
 void Processor::execute_jal(unsigned int funct7, unsigned int rs2, \
                             unsigned int rs1, unsigned int funct3, unsigned int rd) {
 
+    //regfile.write(rd, pc + 1);
+
 }
 
 void Processor::execute_jalr(unsigned int funct7, unsigned int rs2, \
                             unsigned int rs1, unsigned int funct3, unsigned int rd) {
-
+    int32_t imm = ((int)(memory[PC-1] & 0xFFF00000)) >> 20;
+    regfile.write(rd, pc + 1);
+    int32_t address = regfile.read(rs1) + imm;
 }
 
 
