@@ -16,38 +16,12 @@ in all formats to simplify decoding.*/
 #include <array>
 #include <vector>
 #include <cassert>
+#include "regfile.hpp"
+#include "memory.hpp"
 #include "instruction.hpp"
-#include "processing.hpp"
 
 
 namespace rv32i_model {
-
-class Regfile final {
-/*  reg[0] = 0 (always)
-    reg[1] - return address for a call(что вернула функция)
-    reg[5] - alternate link register
-    reg[2] - stack pointer
-*/
-    std::array<int32_t,32> regs;
-public:
-    Regfile() { regs.fill(0); }
-};
-
-class Memory final {
-    std::vector<int32_t> mem;
-public:
-    Memory(std::size_t memory_size) { mem.reserve(memory_size); }
-
-    Memory& operator=(std::vector<int32_t>&& other_mem) {
-        mem = other_mem;
-        return *this;
-    }
-
-    int32_t& operator[](std::size_t i) & { return mem[i]; }
-
-    std::size_t inst_size() { return mem.size(); };
-};
-
 
 class Processor final {
     Regfile regfile;
@@ -62,7 +36,6 @@ public:
     }
 
 private:
-
     int32_t& fetch() {
         int32_t& inst = memory[PC];
         PC++;
@@ -81,22 +54,34 @@ private:
         return inst_d(opcode, rd, rs1, rs2, funct3, funct7);
     }
 
-    void execute(inst_d& dec_inst) {
-        Executer exec;
-        exec.execute(dec_inst);
-    }
+    void execute(inst_d dec_inst);
+
+    typedef void (execute_dinst)(unsigned int funct7, unsigned int rs2, \
+                            unsigned int rs1, unsigned int funct3, unsigned int rd);
+
+    execute_dinst execute_op_imm;
+    execute_dinst execute_op;
+    execute_dinst execute_jal;
+    execute_dinst execute_jalr;
+    execute_dinst execute_branch;
+    execute_dinst execute_load;
+    execute_dinst execute_store;
+    execute_dinst execute_system;
+    execute_dinst execute_fence;
 
 public:
-
     void process() {
         std::size_t inst_number = memory.inst_size();
         while(PC >= 0 && PC < inst_number) {
             int32_t& inst = fetch();
             inst_d dec_inst = decode(inst);
-            //execute(dec_inst);
+            execute(dec_inst);
+            regfile.dump();
+            //write_back
+
         }
-        std::cout << std::endl;
     }
 
 };
+
 }
