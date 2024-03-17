@@ -17,6 +17,7 @@ in all formats to simplify decoding.*/
 #include <vector>
 #include <cassert>
 #include "instruction.hpp"
+#include "processing.hpp"
 
 
 namespace rv32i_model {
@@ -60,32 +61,39 @@ public:
         PC = 0;
     }
 
+private:
+
     int32_t& fetch() {
         int32_t& inst = memory[PC];
         PC++;
         return inst;
     }
 
-    inst_t decode(int32_t& inst) {
+    inst_d decode(int32_t& inst) {
         //применение масок
-        int opcode = inst & 0x7F;
-        int rd = (inst >> 7) & 0x1F;
-        int rs1 = (inst >> 15) & 0x1F;
-        int rs2 = (inst >> 20) & 0x1F;
-        int funct3 = (inst >> 12) & 0x7;
-        int funct7 = (inst >> 25) & 0x7F;
+        unsigned int opcode = inst & 0x7F;
+        unsigned int rd = (inst >> 7) & 0x1F;
+        unsigned int rs1 = (inst >> 15) & 0x1F;
+        unsigned int rs2 = (inst >> 20) & 0x1F;
+        unsigned int funct3 = (inst >> 12) & 0x7;
+        unsigned int funct7 = (inst >> 25) & 0x7F;
 
-        return inst_t(opcode, rd, rs1, rs2, funct3, funct7);
+        return inst_d(opcode, rd, rs1, rs2, funct3, funct7);
     }
 
-    void execute() {}
+    void execute(inst_d& dec_inst) {
+        Executer exec;
+        exec.execute(dec_inst);
+    }
+
+public:
 
     void process() {
         std::size_t inst_number = memory.inst_size();
         while(PC >= 0 && PC < inst_number) {
             int32_t& inst = fetch();
-            auto[opc, rd, rs1, rs2, funct3, funct7] = decode(inst);
-            std::cout << inst << " ";
+            inst_d dec_inst = decode(inst);
+            //execute(dec_inst);
         }
         std::cout << std::endl;
     }
