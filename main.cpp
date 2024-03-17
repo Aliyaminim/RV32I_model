@@ -7,7 +7,7 @@ auto read_input(std::istream& is) {
     std::vector<int32_t> input;
     int32_t inst;
 
-    while(is >> inst, is.good())
+    while(is >> std::hex >> inst, is.good())
         input.push_back(inst);
 
     return input;
