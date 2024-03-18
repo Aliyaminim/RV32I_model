@@ -76,7 +76,7 @@ public:
             int32_t& inst = fetch();
             inst_d dec_inst = decode(inst);
             execute(dec_inst);
-            regfile.dump();
+            //regfile.dump();
             //write_back
 
         }

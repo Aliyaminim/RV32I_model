@@ -5,6 +5,10 @@ hello.cc
 cmp
 draft.in
 res
+helper.cpp
+res.x
+res.dis
+unit_test
 
 
 

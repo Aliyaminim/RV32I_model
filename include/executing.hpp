@@ -37,6 +37,7 @@ void Processor::execute(inst_d dec_inst) {
     auto[opc, rd, rs1, rs2, funct3, funct7] = dec_inst;
     switch (static_cast<Opcode>(opc)) {
         case Opcode::OP_IMM:
+            execute_op_imm(funct7, rs2, rs1, funct3, rd);
             break;
         case Opcode::OP:
             execute_op(funct7, rs2, rs1, funct3, rd);
@@ -69,9 +70,11 @@ void Processor::execute(inst_d dec_inst) {
 
 void Processor::execute_op_imm(unsigned int funct7, unsigned int rs2, \
                             unsigned int rs1, unsigned int funct3, unsigned int rd) {
+    unsigned int imm;
     switch (static_cast<Funct3>(funct3)) {
         case Funct3::VAR_1: //addi
-            unsigned int imm = (funct7 << 5) + rs2;
+            std::cout << "ADDI" << std::endl;
+            imm = (funct7 << 5) + rs2;
             regfile.write(rd, imm + regfile.read(rs1));
             break;
         default:
@@ -87,9 +90,11 @@ void Processor::execute_op(unsigned int funct7, unsigned int rs2, \
         case Funct3::VAR_1:
             switch (static_cast<Funct7>(funct7)) {
                 case Funct7::VAR_1: //add
+                    std::cout << "ADD" << std::endl;
                     regfile.write(rd, regfile.read(rs1) + regfile.read(rs2));
                     break;
                 case Funct7::VAR_2: //sub
+                    std::cout << "SUB" << std::endl;
                     regfile.write(rd, regfile.read(rs1) - regfile.read(rs2));
                     break;
                 default:
@@ -105,15 +110,16 @@ void Processor::execute_op(unsigned int funct7, unsigned int rs2, \
 
 void Processor::execute_jal(unsigned int funct7, unsigned int rs2, \
                             unsigned int rs1, unsigned int funct3, unsigned int rd) {
-
+    std::cout << "JAL" << std::endl;
     //regfile.write(rd, pc + 1);
 
 }
 
 void Processor::execute_jalr(unsigned int funct7, unsigned int rs2, \
                             unsigned int rs1, unsigned int funct3, unsigned int rd) {
+    std::cout << "JALR" << std::endl;
     int32_t imm = ((int)(memory[PC-1] & 0xFFF00000)) >> 20;
-    regfile.write(rd, pc + 1);
+    regfile.write(rd, PC + 1);
     int32_t address = regfile.read(rs1) + imm;
 }
 
