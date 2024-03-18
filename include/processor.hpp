@@ -1,16 +1,9 @@
 #pragma once
 
 /* RV32I contains 40 unique instructions, though a simple implementation might
-
-cover the ECALL/EBREAK instructions with a single SYSTEM hardware instruction that al-
-ways traps and might be able to implement the FENCE instruction as a NOP, reducing base
-
+cover the ECALL/EBREAK instructions with a single SYSTEM hardware instruction that
+always traps and might be able to implement the FENCE instruction as a NOP, reducing base
 instruction count to 38 total.*/
-
-/* The RISC-V ISA keeps the source (rs1 and rs2) and destination (rd) registers at the same position
-in all formats to simplify decoding.*/
-
-//exceptions for strange instruction
 
 #include <cstdint>
 #include <array>

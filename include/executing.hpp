@@ -1,6 +1,6 @@
 #pragma once
 
-#include "proc.hpp"
+#include "processor.hpp"
 #include "instruction.hpp"
 
 namespace rv32i_model {
