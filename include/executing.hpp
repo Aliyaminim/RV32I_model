@@ -111,16 +111,17 @@ void Processor::execute_op(unsigned int funct7, unsigned int rs2, \
 void Processor::execute_jal(unsigned int funct7, unsigned int rs2, \
                             unsigned int rs1, unsigned int funct3, unsigned int rd) {
     std::cout << "JAL" << std::endl;
-    //regfile.write(rd, pc + 1);
 
 }
 
 void Processor::execute_jalr(unsigned int funct7, unsigned int rs2, \
                             unsigned int rs1, unsigned int funct3, unsigned int rd) {
     std::cout << "JALR" << std::endl;
+    #ifdef DEBUG
     int32_t imm = ((int)(memory[PC-1] & 0xFFF00000)) >> 20;
     regfile.write(rd, PC + 1);
     int32_t address = regfile.read(rs1) + imm;
+    #endif
 }
 
 
