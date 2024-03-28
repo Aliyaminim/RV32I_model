@@ -13,7 +13,7 @@ class Regfile final {
 */
     std::array<int32_t,32> regs;
 public:
-    Regfile() { regs.fill(0); regs[0] = 10; }
+    Regfile() { regs.fill(0); }
 
     int32_t read(std::size_t i) const { return regs[i]; }
 
@@ -24,8 +24,8 @@ public:
             regs[i] = value;
     }
 
-    void dump() {
-        for (auto s : regs)
+    void dump() const {
+        for (auto && s : regs)
             std::cout << s << std::endl;
     }
 
