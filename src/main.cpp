@@ -4,8 +4,8 @@
 #include <vector>
 
 auto read_input(std::istream& is) {
-    std::vector<int32_t> input;
-    int32_t inst;
+    std::vector<uint32_t> input;
+    uint32_t inst;
 
     while(is >> std::hex >> inst, is.good())
         input.push_back(inst);
