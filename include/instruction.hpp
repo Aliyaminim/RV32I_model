@@ -5,16 +5,16 @@
 namespace rv32i_model {
 
 class inst_d final {
-    unsigned int opc;
-    unsigned int rd;
-    unsigned int rs1;
-    unsigned int rs2;
-    unsigned int funct3;
-    unsigned int funct7;
+    uint32_t opc;
+    uint32_t rd;
+    uint32_t rs1;
+    uint32_t rs2;
+    uint32_t funct3;
+    uint32_t funct7;
 
     friend class Processor;
 public:
-    inst_d(unsigned int op, unsigned int rd_val, unsigned int rs1_val, unsigned int rs2_val, unsigned int func3_val, unsigned int func7_val)
+    inst_d(uint32_t op, uint32_t rd_val, uint32_t rs1_val, uint32_t rs2_val, uint32_t func3_val, uint32_t func7_val)
         : opc(op), rd(rd_val), rs1(rs1_val), rs2(rs2_val), funct3(func3_val), funct7(func7_val) {}
 
     void dump() {
