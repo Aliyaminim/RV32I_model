@@ -29,9 +29,7 @@ public:
     }
 
 private:
-    uint32_t& fetch() {
-        return memory[PC];
-    }
+    uint32_t& fetch() { return memory[PC]; }
 
     void execute(uint32_t& inst);
 
@@ -41,12 +39,19 @@ public:
 
         while(PC >= 0 && PC < inst_number) {
             uint32_t& inst = fetch();
+            auto curr_pc = PC;
             execute(inst);
-            //regfile.dump();
-            //write_back
-            PC++; //?
+            if (curr_pc == PC)
+                PC++;
         }
     }
+
+    //for testing
+    void write_to_reg(std::size_t reg, int32_t value) { regfile.write(reg, value); }
+    int32_t read_reg(std::size_t reg) const { return regfile.read(reg); }
+
+    void write_to_mem(int32_t address, int32_t value) { memory.write(address, value); }
+    uint32_t read_mem(int32_t address) const { return memory.read(address); }
 
 private:
     typedef void (execute_inst)(instD* dec_inst);
