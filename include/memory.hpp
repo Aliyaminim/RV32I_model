@@ -27,7 +27,7 @@ public:
     }
 
     uint32_t read(int32_t effective_address) const {
-        if ((effective_address < 0) || (effective_address >= (int32_t)mem.size()))
+        if ((effective_address < 0) || (effective_address >= (int32_t)mem.capacity()))
             throw std::runtime_error("Cannot read from memory, invalid address");
 
         return mem[effective_address];
