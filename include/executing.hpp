@@ -126,11 +126,11 @@ void Processor::execute_op(instD* dec_inst) {
     switch (static_cast<Funct3>(funct3)) {
         case Funct3::VAR_0:
             switch (static_cast<Funct7>(funct7)) {
-                case Funct7::VAR_0: //add
+                case Funct7::VAR_0: //ADD
                     std::cout << "ADD" << std::endl;
                     regfile.write(rd, regfile.read(rs1) + regfile.read(rs2));
                     break;
-                case Funct7::VAR_1: //sub
+                case Funct7::VAR_1: //SUB
                     std::cout << "SUB" << std::endl;
                     regfile.write(rd, regfile.read(rs1) - regfile.read(rs2));
                     break;
@@ -184,11 +184,14 @@ void Processor::execute_branch(instD* dec_inst) {
             break;
         case Funct3::VAR_6:
             if ((uint32_t)regfile.read(rs1) < (uint32_t)regfile.read(rs2))
-                PC += imm;
+                PC += imm; //
             break;
         case Funct3::VAR_7:
             if ((uint32_t)regfile.read(rs1) >= (uint32_t)regfile.read(rs2))
-                PC += imm;
+                PC += imm; //
+            break;
+        default:
+            throw std::runtime_error ("Unknown instruction");
             break;
     }
 
@@ -201,26 +204,27 @@ void Processor::execute_load(instD* dec_inst) {
 
     int32_t effective_address = regfile.read(rs1) + imm;
     uint32_t value_tmp = memory.read(effective_address); //>+0
+    int32_t value = 0;
 
     switch(static_cast<Funct3>(funct3)) {
         case Funct3::VAR_0: //LB
             value_tmp = (value_tmp & 0xFF) + ((value_tmp & 0x80) ? 0xFFFFFF00 : 0x0);
-            int32_t value = (int32_t)value_tmp;
+            value = (int32_t)value_tmp;
             break;
         case Funct3::VAR_1: //LH
             value_tmp = (value_tmp & 0xFFFF) + ((value_tmp & 0x8000) ? 0xFFFF0000 : 0x0);
-            int32_t value = (int32_t)value_tmp;
+            value = (int32_t)value_tmp;
             break;
         case Funct3::VAR_2: //LW
-            int32_t value = (int32_t)value_tmp;
+            value = (int32_t)value_tmp;
             break;
         case Funct3::VAR_4: //LBU
             value_tmp = (value_tmp & 0xFF);
-            int32_t value = (int32_t)value_tmp;
+            value = (int32_t)value_tmp;
             break;
         case Funct3::VAR_5: //LHU
             value_tmp = (value_tmp & 0xFFFF);
-            int32_t value = (int32_t)value_tmp;
+            value = (int32_t)value_tmp;
             break;
         default:
             throw std::runtime_error ("Unknown instruction");
@@ -239,13 +243,13 @@ void Processor::execute_store(instD* dec_inst) {
 
     switch(static_cast<Funct3>(funct3)) {
         case Funct3::VAR_0: //SB
-            regfile.write(rd, value & 0xFF);
+            memory.write(effective_address, value & 0xFF);
             break;
         case Funct3::VAR_1: //SH
-            regfile.write(rd, value & 0xFFFF);
+            memory.write(effective_address, value & 0xFFFF);
             break;
         case Funct3::VAR_2: //SW
-            regfile.write(rd, value);
+            memory.write(effective_address, value);
             break;
         default:
             throw std::runtime_error ("Unknown instruction");
@@ -255,11 +259,11 @@ void Processor::execute_store(instD* dec_inst) {
 }
 
 void Processor::execute_system(instD* dec_inst) {
-
+    throw std::runtime_error ("Unknown instruction");
 }
 
 void Processor::execute_fence(instD* dec_inst) {
-
+    throw std::runtime_error ("Unknown instruction");
 }
 
 }
