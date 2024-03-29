@@ -87,8 +87,8 @@ public:
         rs2 = (inst >> 20) & 0x1F;
         funct3 = (inst >> 12) & 0x7;
         uint32_t imm_tmp = ((inst & 0x80000000) ? 0xFFFFE000 : 0x0);
-        imm_tmp += ((inst >> 7) & 0x1) << 11 + ((inst >> 8) & 0xF) << 1;
-        imm_tmp += ((inst >> 25) & 0x3F) << 5 + ((inst >> 31) & 0x1) << 12;
+        imm_tmp += (((inst >> 7) & 0x1) << 11) + (((inst >> 8) & 0xF) << 1);
+        imm_tmp += (((inst >> 25) & 0x3F) << 5) + (((inst >> 31) & 0x1) << 12);
         imm = (int32_t)imm_tmp;
     }
     ~instD_B() = default;
