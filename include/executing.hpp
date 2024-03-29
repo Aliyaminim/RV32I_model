@@ -79,12 +79,15 @@ void Processor::execute(uint32_t& inst) {
             execute_store(dec_inst.get());
             break;
         case Opcode::SYSTEM:
-            //execute_system(funct7, rs2, rs1, funct3, rd);
+            dec_inst = std::make_unique<instD_I>(inst);
+            execute_system(dec_inst.get());
             break;
         case Opcode::FENCE:
-            //execute_fence(funct7, rs2, rs1, funct3, rd);
+            dec_inst = std::make_unique<instD_I>(inst);
+            execute_fence(dec_inst.get());
             break;
         default:
+            throw std::runtime_error ("Unknown instruction");
             break;
     }
 }
@@ -100,9 +103,11 @@ void Processor::execute_op_imm(instD* dec_inst) {
         case Funct3::VAR_2: //slti
             std::cout << "SLTI" << std::endl;
             regfile.write(rd, ((int32_t)regfile.read(rs1) < (int32_t)imm));
+            break;
         case Funct3::VAR_3: //sltiu
             std::cout << "SLTIU" << std::endl;
             regfile.write(rd, ((uint32_t)regfile.read(rs1) < (uint32_t)imm));
+            break;
         default:
             throw std::runtime_error ("Unknown instruction");
             break;
@@ -184,11 +189,11 @@ void Processor::execute_branch(instD* dec_inst) {
             break;
         case Funct3::VAR_6:
             if ((uint32_t)regfile.read(rs1) < (uint32_t)regfile.read(rs2))
-                PC += imm; //
+                PC += imm;
             break;
         case Funct3::VAR_7:
             if ((uint32_t)regfile.read(rs1) >= (uint32_t)regfile.read(rs2))
-                PC += imm; //
+                PC += imm;
             break;
         default:
             throw std::runtime_error ("Unknown instruction");
@@ -259,10 +264,12 @@ void Processor::execute_store(instD* dec_inst) {
 }
 
 void Processor::execute_system(instD* dec_inst) {
+    std::cout << "SYSTEM" << std::endl;
     throw std::runtime_error ("Unknown instruction");
 }
 
 void Processor::execute_fence(instD* dec_inst) {
+    std::cout << "FENCE" << std::endl;
     throw std::runtime_error ("Unknown instruction");
 }
 
