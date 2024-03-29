@@ -29,52 +29,39 @@ public:
     }
 
 private:
-    int32_t& fetch() {
-        int32_t& inst = memory[PC];
-        PC++;
-        return inst;
+    uint32_t& fetch() {
+        return memory[PC];
     }
 
-    inst_d decode(int32_t& inst) {
-        //применение масок
-        unsigned int opcode = inst & 0x7F;
-        unsigned int rd = (inst >> 7) & 0x1F;
-        unsigned int rs1 = (inst >> 15) & 0x1F;
-        unsigned int rs2 = (inst >> 20) & 0x1F;
-        unsigned int funct3 = (inst >> 12) & 0x7;
-        unsigned int funct7 = (inst >> 25) & 0x7F;
-
-        return inst_d(opcode, rd, rs1, rs2, funct3, funct7);
-    }
-
-    void execute(inst_d dec_inst);
-
-    typedef void (execute_dinst)(unsigned int funct7, unsigned int rs2, \
-                            unsigned int rs1, unsigned int funct3, unsigned int rd);
-
-    execute_dinst execute_op_imm;
-    execute_dinst execute_op;
-    execute_dinst execute_jal;
-    execute_dinst execute_jalr;
-    execute_dinst execute_branch;
-    execute_dinst execute_load;
-    execute_dinst execute_store;
-    execute_dinst execute_system;
-    execute_dinst execute_fence;
+    void execute(uint32_t& inst);
 
 public:
     void process() {
         std::size_t inst_number = memory.inst_size();
+
         while(PC >= 0 && PC < inst_number) {
-            int32_t& inst = fetch();
-            inst_d dec_inst = decode(inst);
-            execute(dec_inst);
+            uint32_t& inst = fetch();
+            execute(inst);
             //regfile.dump();
             //write_back
-
+            PC++; //?
         }
     }
 
+private:
+    typedef void (execute_inst)(instD* dec_inst);
+
+    execute_inst execute_op_imm;
+    execute_inst execute_lui;
+    execute_inst execute_auipc;
+    execute_inst execute_op;
+    execute_inst execute_jal;
+    execute_inst execute_jalr;
+    execute_inst execute_branch;
+    execute_inst execute_load;
+    execute_inst execute_store;
+    execute_inst execute_system;
+    execute_inst execute_fence;
 };
 
 }
