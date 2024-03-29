@@ -1,6 +1,5 @@
 #include <iostream>
-#include "processor.hpp"
-#include "executing.hpp"
+#include "rv32i_model.hpp"
 #include <vector>
 
 auto read_input(std::istream& is) {
