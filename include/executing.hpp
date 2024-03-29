@@ -71,10 +71,12 @@ void Processor::execute(uint32_t& inst) {
             execute_branch(dec_inst.get());
             break;
         case Opcode::LOAD:
-            //execute_load(funct7, rs2, rs1, funct3, rd);
+            dec_inst = std::make_unique<instD_I>(inst);
+            execute_load(dec_inst.get());
             break;
         case Opcode::STORE:
-            //execute_store(funct7, rs2, rs1, funct3, rd);
+            dec_inst = std::make_unique<instD_S>(inst);
+            execute_store(dec_inst.get());
             break;
         case Opcode::SYSTEM:
             //execute_system(funct7, rs2, rs1, funct3, rd);
@@ -194,11 +196,61 @@ void Processor::execute_branch(instD* dec_inst) {
 
 
 void Processor::execute_load(instD* dec_inst) {
+    std::cout << "LOAD" << std::endl;
+    auto[opc, rd, rs1, funct3, imm] = *dynamic_cast<instD_I*>(dec_inst);
 
+    int32_t effective_address = regfile.read(rs1) + imm;
+    uint32_t value_tmp = memory.read(effective_address); //>+0
+
+    switch(static_cast<Funct3>(funct3)) {
+        case Funct3::VAR_0: //LB
+            value_tmp = (value_tmp & 0xFF) + ((value_tmp & 0x80) ? 0xFFFFFF00 : 0x0);
+            int32_t value = (int32_t)value_tmp;
+            break;
+        case Funct3::VAR_1: //LH
+            value_tmp = (value_tmp & 0xFFFF) + ((value_tmp & 0x8000) ? 0xFFFF0000 : 0x0);
+            int32_t value = (int32_t)value_tmp;
+            break;
+        case Funct3::VAR_2: //LW
+            int32_t value = (int32_t)value_tmp;
+            break;
+        case Funct3::VAR_4: //LBU
+            value_tmp = (value_tmp & 0xFF);
+            int32_t value = (int32_t)value_tmp;
+            break;
+        case Funct3::VAR_5: //LHU
+            value_tmp = (value_tmp & 0xFFFF);
+            int32_t value = (int32_t)value_tmp;
+            break;
+        default:
+            throw std::runtime_error ("Unknown instruction");
+            break;
+    }
+    regfile.write(rd, value);
 }
 
 
 void Processor::execute_store(instD* dec_inst) {
+    std::cout << "STORE" << std::endl;
+    auto[opc, rs1, rs2, funct3, imm] = *dynamic_cast<instD_S*>(dec_inst);
+
+    int32_t effective_address = regfile.read(rs1) + imm;
+    int32_t value = regfile.read(rs2);
+
+    switch(static_cast<Funct3>(funct3)) {
+        case Funct3::VAR_0: //SB
+            regfile.write(rd, value & 0xFF);
+            break;
+        case Funct3::VAR_1: //SH
+            regfile.write(rd, value & 0xFFFF);
+            break;
+        case Funct3::VAR_2: //SW
+            regfile.write(rd, value);
+            break;
+        default:
+            throw std::runtime_error ("Unknown instruction");
+            break;
+    }
 
 }
 
