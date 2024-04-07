@@ -80,7 +80,7 @@ TEST(Jump_inst, JAL) {
     model.write_to_reg(3, 20);
     model.write_to_reg(2, 10);
 
-    std::vector<uint32_t> input{0x2002EF, 0x3100B3, 0x403100B3};
+    std::vector<uint32_t> input{0x8002EF, 0x3100B3, 0x403100B3};
     model.load_input_to_memory(input);
     model.process();
 
@@ -91,9 +91,9 @@ TEST(Jump_inst, JALR) {
     Processor model(1024);
     model.write_to_reg(3, 20);
     model.write_to_reg(2, 10);
-    model.write_to_reg(7, 1);
+    model.write_to_reg(7, 4);
 
-    std::vector<uint32_t> input{0x1382E7, 0x3100B3, 0x403100B3};
+    std::vector<uint32_t> input{0x4382E7, 0x3100B3, 0x403100B3};
     model.load_input_to_memory(input);
     model.process();
 
@@ -106,7 +106,7 @@ TEST(Branch_inst, BEQ) {
     model.write_to_reg(1, 10);
     model.write_to_reg(2, 10);
 
-    std::vector<uint32_t> input{0x208163, 0x6464, 0x197};
+    std::vector<uint32_t> input{0x208463, 0x6464, 0x197};
     model.load_input_to_memory(input);
     model.process();
 
@@ -118,7 +118,7 @@ TEST(Branch_inst, BNE) {
     model.write_to_reg(1, 10);
     model.write_to_reg(2, 9);
 
-    std::vector<uint32_t> input{0x209163, 0x6454, 0x197};
+    std::vector<uint32_t> input{0x209463, 0x6454, 0x197};
     model.load_input_to_memory(input);
     model.process();
 
@@ -130,7 +130,7 @@ TEST(Branch_inst, BLT) {
     model.write_to_reg(1, -5);
     model.write_to_reg(2, -1);
 
-    std::vector<uint32_t> input{0x20C163, 0x6454, 0x197};
+    std::vector<uint32_t> input{0x20C463, 0x6454, 0x197};
     model.load_input_to_memory(input);
     model.process();
 
@@ -142,7 +142,7 @@ TEST(Branch_inst, BGE) {
     model.write_to_reg(1, -3834);
     model.write_to_reg(2, -38238);
 
-    std::vector<uint32_t> input{0x20D163, 0x6454, 0x197};
+    std::vector<uint32_t> input{0x20D463, 0x6454, 0x197};
     model.load_input_to_memory(input);
     model.process();
 
@@ -154,7 +154,7 @@ TEST(Branch_inst, BLTU) {
     model.write_to_reg(1, -1);
     model.write_to_reg(2, -2);
 
-    std::vector<uint32_t> input{0x20E163, 0x6454, 0x197};
+    std::vector<uint32_t> input{0x20E463, 0x6454, 0x197};
     model.load_input_to_memory(input);
     try {
         model.process();
@@ -170,7 +170,7 @@ TEST(Branch_inst, BGEU){
     model.write_to_reg(1, -3834);
     model.write_to_reg(2, -38238);
 
-    std::vector<uint32_t> input{0x20F163, 0x6454, 0x197};
+    std::vector<uint32_t> input{0x20F463, 0x6454, 0x197};
     model.load_input_to_memory(input);
     model.process();
 
