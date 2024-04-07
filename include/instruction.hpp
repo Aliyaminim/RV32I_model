@@ -9,8 +9,7 @@ public:
     virtual ~instD() = default;
 };
 
-//только по типу можно
-class instD_R : public instD {
+class instD_R final : public instD {
     uint32_t opc;
     uint32_t rd;
     uint32_t rs1;
@@ -32,7 +31,7 @@ public:
     ~instD_R() = default;
 };
 
-class instD_I : public instD {
+class instD_I final : public instD {
     uint32_t opc;
     uint32_t rd;
     uint32_t rs1;
@@ -52,7 +51,7 @@ public:
     ~instD_I() = default;
 };
 
-class instD_S : public instD {
+class instD_S final : public instD {
     uint32_t opc;
     uint32_t rs1;
     uint32_t rs2;
@@ -72,7 +71,7 @@ public:
     ~instD_S() = default;
 };
 
-class instD_B : public instD {
+class instD_B final : public instD {
     uint32_t opc;
     uint32_t rs1;
     uint32_t rs2;
@@ -94,7 +93,7 @@ public:
     ~instD_B() = default;
 };
 
-class instD_U : public instD {
+class instD_U final : public instD {
     uint32_t opc;
     uint32_t rd;
     int32_t imm;
@@ -109,7 +108,7 @@ public:
     ~instD_U() = default;
 };
 
-class instD_J : public instD {
+class instD_J final : public instD {
     uint32_t opc;
     uint32_t rd;
     int32_t imm;
