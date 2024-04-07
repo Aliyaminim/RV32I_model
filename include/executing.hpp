@@ -36,10 +36,11 @@ enum class Funct7 : uint32_t {
     VAR_1 = 0x20
 };
 
-void Processor::execute(uint32_t& inst) {
+//returns 1 if jump or branch occurred, otherwise 0
+int Processor::execute(uint32_t& inst) {
     uint32_t opcode = inst & 0x7F;
     std::unique_ptr<instD> dec_inst;
-    //здесь проверили на наличие в instruction cache
+    int ret_jb = 0;
 
     switch (static_cast<Opcode>(opcode)) {
         case Opcode::OP_IMM:
@@ -61,14 +62,16 @@ void Processor::execute(uint32_t& inst) {
         case Opcode::JAL:
             dec_inst = std::make_unique<instD_J>(inst);
             execute_jal(dec_inst.get());
+            ret_jb = 1;
             break;
         case Opcode::JALR:
             dec_inst = std::make_unique<instD_I>(inst);
             execute_jalr(dec_inst.get());
+            ret_jb = 1;
             break;
         case Opcode::BRANCH:
             dec_inst = std::make_unique<instD_B>(inst);
-            execute_branch(dec_inst.get());
+            ret_jb = execute_branch(dec_inst.get());
             break;
         case Opcode::LOAD:
             dec_inst = std::make_unique<instD_I>(inst);
@@ -90,15 +93,20 @@ void Processor::execute(uint32_t& inst) {
             throw std::runtime_error ("Unknown instruction");
             break;
     }
+
+    return ret_jb;
 }
 
 void Processor::execute_op_imm(instD* dec_inst) {
     auto[opc, rd, rs1, funct3, imm] = *dynamic_cast<instD_I*>(dec_inst);
 
     switch (static_cast<Funct3>(funct3)) {
-        case Funct3::VAR_0: //addi
+        case Funct3::VAR_0: //addi or nop
             std::cout << "ADDI" << std::endl;
-            regfile.write(rd, imm + regfile.read(rs1));
+            if ((rs1 == 0) && (rd == 0) && (imm == 0))
+                increase_PC(); //nop
+            else
+                regfile.write(rd, imm + regfile.read(rs1));
             break;
         case Funct3::VAR_2: //slti
             std::cout << "SLTI" << std::endl;
@@ -108,8 +116,20 @@ void Processor::execute_op_imm(instD* dec_inst) {
             std::cout << "SLTIU" << std::endl;
             regfile.write(rd, ((uint32_t)regfile.read(rs1) < (uint32_t)imm));
             break;
+        case Funct3::VAR_4: //xori
+            std::cout << "XORI" << std::endl;
+            regfile.write(rd, ((uint32_t)regfile.read(rs1) ^ (uint32_t)imm));
+            break;
+        case Funct3::VAR_6: //ori
+            std::cout << "ORI" << std::endl;
+            regfile.write(rd, ((uint32_t)regfile.read(rs1) | (uint32_t)imm));
+            break;
+        case Funct3::VAR_7: //andi
+            std::cout << "ANDI" << std::endl;
+            regfile.write(rd, ((uint32_t)regfile.read(rs1) & (uint32_t)imm));
+            break;
         default:
-            throw std::runtime_error ("Unknown instruction");
+            throw std::runtime_error ("Unknown integer register-immediate instruction: funct3 = " + funct3);
             break;
     }
 }
@@ -121,13 +141,14 @@ void Processor::execute_lui(instD* dec_inst) {
 
 void Processor::execute_auipc(instD* dec_inst) {
     auto[opc, rd, imm] = *dynamic_cast<instD_U*>(dec_inst);
-    imm += (int32_t)PC;
+    imm += (int32_t)get_PC();
     regfile.write(rd, imm);
 }
 
 void Processor::execute_op(instD* dec_inst) {
     auto[opc, rd, rs1, rs2, funct3, funct7] = *dynamic_cast<instD_R*>(dec_inst);
 
+    uint32_t tmp_res = 0;
     switch (static_cast<Funct3>(funct3)) {
         case Funct3::VAR_0:
             switch (static_cast<Funct7>(funct7)) {
@@ -144,6 +165,51 @@ void Processor::execute_op(instD* dec_inst) {
                     break;
             }
             break;
+        case Funct3::VAR_2: //slt
+            std::cout << "SLT" << std::endl;
+            tmp_res = ((int32_t)regfile.read(rs1) < (int32_t)regfile.read(rs2)) ? 1u : 0;
+            regfile.write(rd, tmp_res);
+            break;
+        case Funct3::VAR_3: //sltu
+            std::cout << "SLTU" << std::endl;
+            if (rs1 != 0)
+                tmp_res = ((uint32_t)regfile.read(rs1) < (uint32_t)regfile.read(rs2)) ? 1u : 0;
+            else
+                //rs1 == x0
+                tmp_res = ((uint32_t)regfile.read(rs2) != (uint32_t)regfile.read(rs1)) ? 1u : 0;
+            regfile.write(rd, tmp_res);
+            break;
+        case Funct3::VAR_7: //add
+            std::cout << "AND" << std::endl;
+            regfile.write(rd, ((uint32_t)regfile.read(rs1) & (uint32_t)regfile.read(rs2)));
+            break;
+        case Funct3::VAR_6: //or
+            std::cout << "OR" << std::endl;
+            regfile.write(rd, ((uint32_t)regfile.read(rs1) | (uint32_t)regfile.read(rs2)));
+            break;
+        case Funct3::VAR_4: //xor
+            std::cout << "XOR" << std::endl;
+            regfile.write(rd, ((uint32_t)regfile.read(rs1) ^ (uint32_t)regfile.read(rs2)));
+            break;
+        case Funct3::VAR_1: //sll
+            std::cout << "SLL" << std::endl;
+            tmp_res = regfile.read(rs1) << regfile.read(rs2);
+            regfile.write(rd, tmp_res);
+            break;
+        case Funct3::VAR_5:
+            switch (static_cast<Funct7>(funct7)) {
+                case Funct7::VAR_0: //srl
+                    std::cout << "SRL" << std::endl;
+                    tmp_res = ((uint32_t)regfile.read(rs1)) >> regfile.read(rs2);
+                    regfile.write(rd, tmp_res);
+                    break;
+                case Funct7::VAR_1: //sra
+                    std::cout << "SRA" << std::endl;
+                    tmp_res = ((int32_t)regfile.read(rs1)) >> regfile.read(rs2);
+                    regfile.write(rd, tmp_res);
+                    break;
+            }
+            break;
         default:
             throw std::runtime_error ("Unknown instruction");
             break;
@@ -153,8 +219,14 @@ void Processor::execute_op(instD* dec_inst) {
 void Processor::execute_jal(instD* dec_inst) {
     std::cout << "JAL" << std::endl;
     auto[opc, rd, imm] = *dynamic_cast<instD_J*>(dec_inst);
-    regfile.write(rd, PC + 1);
-    PC += imm;
+    std::size_t imm_2index = imm /sizeof(uint32_t);
+    regfile.write(rd, get_PC() + 1);
+
+    if ( !(imm & 0x3) ) {
+        // The address is 4-byte aligned here
+        increase_PC(imm_2index);
+    } else
+        throw std::runtime_error ("An instruction-address-misaligned exception");
 }
 
 void Processor::execute_jalr(instD* dec_inst) {
@@ -162,44 +234,67 @@ void Processor::execute_jalr(instD* dec_inst) {
     auto[opc, rd, rs1, funct3, imm] = *dynamic_cast<instD_I*>(dec_inst);
 
     int32_t new_address = regfile.read(rs1) + imm;
-    regfile.write(rd, PC + 1);
-    PC = new_address;
+    std::size_t new_address_2index = new_address /sizeof(uint32_t);
+
+    if (rd != 0) //sometimes dest is not required
+        regfile.write(rd, get_PC() + 1);
+
+    if ( !(new_address & 0x3) ) {
+        // The address is 4-byte aligned here
+        set_PC(new_address_2index);
+    } else
+        throw std::runtime_error ("An instruction-address-misaligned exception");
 }
 
 
-void Processor::execute_branch(instD* dec_inst) {
+int Processor::execute_branch(instD* dec_inst) {
     std::cout << "BRANCH" << std::endl;
     auto[opc, rs1, rs2, funct3, imm] = *dynamic_cast<instD_B*>(dec_inst);
+    bool branch_flag = false;
+    std::size_t imm_2index = imm /sizeof(uint32_t);
+
     switch(static_cast<Funct3>(funct3)) {
-        case Funct3::VAR_0:
+        case Funct3::VAR_0: //beq
             if (regfile.read(rs1) == regfile.read(rs2))
-                PC += imm;
+                branch_flag = true;
             break;
-        case Funct3::VAR_1:
+        case Funct3::VAR_1: //bne
             if (regfile.read(rs1) != regfile.read(rs2))
-                PC += imm;
+                branch_flag = true;
             break;
-        case Funct3::VAR_4:
+        case Funct3::VAR_4: //blt
             if (regfile.read(rs1) < regfile.read(rs2))
-                PC += imm;
+                branch_flag = true;
             break;
-        case Funct3::VAR_5:
+        case Funct3::VAR_5: //bgeu
             if (regfile.read(rs1) >= regfile.read(rs2))
-                PC += imm;
+                branch_flag = true;
             break;
-        case Funct3::VAR_6:
+        case Funct3::VAR_6: //bltu
             if ((uint32_t)regfile.read(rs1) < (uint32_t)regfile.read(rs2))
-                PC += imm;
+                branch_flag = true;
             break;
-        case Funct3::VAR_7:
+        case Funct3::VAR_7: //bge
             if ((uint32_t)regfile.read(rs1) >= (uint32_t)regfile.read(rs2))
-                PC += imm;
+                branch_flag = true;
             break;
         default:
+            std::cout << funct3 << std::endl;
             throw std::runtime_error ("Unknown instruction");
             break;
     }
 
+    if (branch_flag) {
+        if ( !(imm & 0x3) ) {
+            // The address is 4-byte aligned here
+            std::cout << PC + imm_2index << std::endl;
+            increase_PC(imm_2index);
+        } else
+            throw std::runtime_error ("An instruction-address-misaligned exception");
+
+    }
+
+    return branch_flag;
 }
 
 
