@@ -25,7 +25,7 @@ public:
 
     void load_input_to_memory(auto && data) {
         memory = std::move(data);
-        PC = 0;
+        set_PC(0);
     }
 
 private:
@@ -42,7 +42,7 @@ public:
             auto curr_pc = PC;
             execute(inst);
             if (curr_pc == PC)
-                PC++;
+                increase_PC();
         }
     }
 
@@ -67,6 +67,10 @@ private:
     execute_inst execute_store;
     execute_inst execute_system;
     execute_inst execute_fence;
+
+    void increase_PC(std::size_t value = 1) { PC += value; }
+    std::size_t get_PC() const noexcept{ return PC; }
+    void set_PC(std::size_t value) { PC = value; }
 };
 
 }
