@@ -31,7 +31,7 @@ public:
 private:
     uint32_t& fetch() { return memory[PC]; }
 
-    void execute(uint32_t& inst);
+    int execute(uint32_t& inst);
 
 public:
     void process() {
@@ -39,9 +39,7 @@ public:
 
         while(PC >= 0 && PC < inst_number) {
             uint32_t& inst = fetch();
-            auto curr_pc = PC;
-            execute(inst);
-            if (curr_pc == PC)
+            if (!execute(inst))
                 increase_PC();
         }
     }
@@ -62,11 +60,11 @@ private:
     execute_inst execute_op;
     execute_inst execute_jal;
     execute_inst execute_jalr;
-    execute_inst execute_branch;
     execute_inst execute_load;
     execute_inst execute_store;
     execute_inst execute_system;
     execute_inst execute_fence;
+    int execute_branch(instD* dec_inst);
 
     void increase_PC(std::size_t value = 1) { PC += value; }
     std::size_t get_PC() const noexcept{ return PC; }
