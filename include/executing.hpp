@@ -279,7 +279,6 @@ int Processor::execute_branch(instD* dec_inst) {
                 branch_flag = true;
             break;
         default:
-            std::cout << funct3 << std::endl;
             throw std::runtime_error ("Unknown instruction");
             break;
     }
@@ -287,7 +286,6 @@ int Processor::execute_branch(instD* dec_inst) {
     if (branch_flag) {
         if ( !(imm & 0x3) ) {
             // The address is 4-byte aligned here
-            std::cout << PC + imm_2index << std::endl;
             increase_PC(imm_2index);
         } else
             throw std::runtime_error ("An instruction-address-misaligned exception");
