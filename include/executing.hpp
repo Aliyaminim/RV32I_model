@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <unistd.h>
 #include "processor.hpp"
 #include "instruction.hpp"
 
@@ -289,7 +290,6 @@ int Processor::execute_branch(instD* dec_inst) {
             increase_PC(imm_2index);
         } else
             throw std::runtime_error ("An instruction-address-misaligned exception");
-
     }
 
     return branch_flag;
@@ -358,7 +358,35 @@ void Processor::execute_store(instD* dec_inst) {
 
 void Processor::execute_system(instD* dec_inst) {
     std::cout << "SYSTEM" << std::endl;
-    throw std::runtime_error ("Unknown instruction");
+    enum {
+        syscall_READ = 63,
+        syscall_WRITE = 64,
+        syscall_EXIT = 93
+    };
+
+    auto syscall_type = regfile.read(17);
+
+    int32_t fd = regfile.read(10);
+    int32_t status = fd;
+    int32_t buf_model = regfile.read(11);
+    int32_t size = regfile.read(12);
+    void* buf = static_cast<char*>(memory.begin()) + buf_model;
+
+    switch (syscall_type) {
+        case syscall_READ:
+            read(fd, buf, size);
+            break;
+        case syscall_WRITE:
+            write(fd, buf, size);
+            break;
+        case syscall_EXIT:
+            exit(status);
+            break;
+        default:
+            throw std::runtime_error ("Unknown system call");
+            break;
+    }
+
 }
 
 void Processor::execute_fence(instD* dec_inst) {
