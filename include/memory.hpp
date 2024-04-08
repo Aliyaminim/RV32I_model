@@ -16,6 +16,7 @@ public:
     }
 
     uint32_t& operator[](std::size_t i) & { return mem[i]; }
+    void* begin() { return mem.data(); }
 
     std::size_t inst_size() { return mem.size(); };
 
