@@ -21,29 +21,31 @@ namespace rv32i_model {
 class Processor final {
     Regfile regfile;
     Memory memory;
-    std::size_t PC;
+    int32_t PC;
     std::ostream& logstream;
 public:
     Processor(std::size_t memory_size, std::ostream& _logstream_ = std::cout) : regfile(), memory(memory_size),
         PC(-1), logstream(_logstream_) {}
 
     template <typename It>
-    void load_input_to_memory(It input_start, It input_fin) {
+    void load_input_to_memory(It input_start, It input_fin, int32_t start_addr = 0) {
         memory.fill(input_start, input_fin);
-        set_PC(0);
+        set_PC(start_addr);
     }
 
 private:
-    uint32_t& fetch() { return memory[PC]; }
+    uint32_t& fetch() { return read_mem(PC); }
 
     int execute(uint32_t& inst);
 
 public:
     void process() {
-        std::size_t inst_number = memory.inst_size();
+        while(PC >= 0) {
+            if(PC >= memory.size() * sizeof(uint32_t))
+                break;
 
-        while(PC >= 0 && PC < inst_number) {
             uint32_t& inst = fetch();
+
             if (!execute(inst))
                 increase_PC();
         }
@@ -54,7 +56,7 @@ public:
     int32_t read_reg(std::size_t reg) const { return regfile.read(reg); }
 
     void write_to_mem(int32_t address, int32_t value) { memory.write(address, value); }
-    uint32_t read_mem(int32_t address) const { return memory.read(address); }
+    uint32_t& read_mem(int32_t address) { return memory.read(address); }
 
     void dump_memory() const { memory.dump(logstream); }
 
@@ -73,7 +75,7 @@ private:
     execute_inst execute_fence;
     int execute_branch(instD* dec_inst);
 
-    void increase_PC(std::size_t value = 1) { PC += value; }
+    void increase_PC(std::size_t value = sizeof(uint32_t)) { PC += value; }
     std::size_t get_PC() const noexcept{ return PC; }
     void set_PC(std::size_t value) { PC = value; }
 };
