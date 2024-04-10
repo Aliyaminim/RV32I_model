@@ -13,10 +13,15 @@ cmake --build .
 
 ## How to run the program
 ```bash
-./main < [file]
+./main [file]
+```
+As an example, you can use the prepared hello-world program:
+```bash
+./main ../hello_test/hello.bin 
 ```
 
 ## How to test the program
+Sorry, unit testing is down today due to new changes, but some tests are still passing. I will fix this asap.
 ```bash
 ./tests/unit_test 
 ```
