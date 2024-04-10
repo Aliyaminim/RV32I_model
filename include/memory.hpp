@@ -12,6 +12,7 @@ public:
 
     uint32_t& operator[](std::size_t i) & { return mem[i]; }
     void* begin_ptr() { return mem.data(); }
+    std::size_t size() const { return mem.size(); }
 
     void write(int32_t effective_address, int32_t value) {
         if ((effective_address < 0) || (effective_address >= (int32_t)mem.size() * sizeof(int32_t)))
@@ -25,7 +26,7 @@ public:
             throw std::runtime_error ("An address-misaligned exception");
     }
 
-    uint32_t read(int32_t effective_address) const {
+    uint32_t& read(int32_t effective_address) {
         if ((effective_address < 0) || (effective_address >= (int32_t)mem.size() * sizeof(int32_t)))
             throw std::runtime_error("Cannot read from memory, invalid address");
 
