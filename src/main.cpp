@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
         rv32i_model::Processor model_rv32i(mem_size, logstream);
 
         std::vector<uint32_t> memory_image = get_memory_image(argv[1]);
-        model_rv32i.load_input_to_memory(memory_image);
+        model_rv32i.load_input_to_memory(memory_image.begin(), memory_image.end());
 
         #ifdef DEBUG
         model_rv32i.dump_memory();
