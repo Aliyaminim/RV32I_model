@@ -9,6 +9,8 @@ instruction count to 38 total.*/
 #include <array>
 #include <vector>
 #include <cassert>
+#include <fstream>
+#include <iostream>
 #include "regfile.hpp"
 #include "memory.hpp"
 #include "instruction.hpp"
@@ -20,11 +22,14 @@ class Processor final {
     Regfile regfile;
     Memory memory;
     std::size_t PC;
+    std::ostream& logstream;
 public:
-    Processor(std::size_t memory_size) : regfile(), memory(memory_size), PC(-1) {}
+    Processor(std::size_t memory_size, std::ostream& _logstream_ = std::cout) : regfile(), memory(memory_size),
+        PC(-1), logstream(_logstream_) {}
 
-    void load_input_to_memory(auto && data) {
-        memory = std::move(data);
+    template <typename It>
+    void load_input_to_memory(It input_start, It input_fin) {
+        memory.fill(input_start, input_fin);
         set_PC(0);
     }
 
@@ -50,6 +55,8 @@ public:
 
     void write_to_mem(int32_t address, int32_t value) { memory.write(address, value); }
     uint32_t read_mem(int32_t address) const { return memory.read(address); }
+
+    void dump_memory() const { memory.dump(logstream); }
 
 private:
     typedef void (execute_inst)(instD* dec_inst);
