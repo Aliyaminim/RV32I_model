@@ -41,7 +41,7 @@ private:
 public:
     void process() {
         while(PC >= 0) {
-            if(PC >= memory.size() * sizeof(uint32_t))
+            if((uint32_t)PC >= memory.size() * sizeof(uint32_t))
                 break;
 
             uint32_t& inst = fetch();

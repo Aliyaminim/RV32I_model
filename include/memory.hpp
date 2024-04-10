@@ -15,7 +15,7 @@ public:
     std::size_t size() const { return mem.size(); }
 
     void write(int32_t effective_address, int32_t value) {
-        if ((effective_address < 0) || (effective_address >= (int32_t)mem.size() * sizeof(int32_t)))
+        if ((effective_address < 0) || ((uint32_t)effective_address >= mem.size() * sizeof(int32_t)))
             throw std::runtime_error("Cannot write to memory, invalid address");
 
         if ( !(effective_address & 0x3) ) {
@@ -27,7 +27,7 @@ public:
     }
 
     uint32_t& read(int32_t effective_address) {
-        if ((effective_address < 0) || (effective_address >= (int32_t)mem.size() * sizeof(int32_t)))
+        if ((effective_address < 0) || ((uint32_t)effective_address >= mem.size() * sizeof(int32_t)))
             throw std::runtime_error("Cannot read from memory, invalid address");
 
         if ( !(effective_address & 0x3) ) {
