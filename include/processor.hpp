@@ -21,14 +21,14 @@ namespace rv32i_model {
 class Processor final {
     Regfile regfile;
     Memory memory;
-    int32_t PC;
+    uint32_t PC;
     std::ostream& logstream;
 public:
     Processor(std::size_t memory_size, std::ostream& _logstream_ = std::cout) : regfile(), memory(memory_size),
-        PC(-1), logstream(_logstream_) {}
+        PC(0), logstream(_logstream_) {}
 
     template <typename It>
-    void load_input_to_memory(It input_start, It input_fin, int32_t start_addr = 0) {
+    void load_input_to_memory(It input_start, It input_fin, uint32_t start_addr = 0) {
         memory.fill(input_start, input_fin);
         set_PC(start_addr);
     }
@@ -39,16 +39,28 @@ private:
     int execute(uint32_t& inst);
 
 public:
-    void process() {
-        while(PC >= 0) {
-            if((uint32_t)PC >= memory.size() * sizeof(uint32_t))
+    bool stop_process_flag = false;
+    bool jump_flag = false;
+
+    int process() {
+        int exec = 0;
+        for (;;) {
+            if(PC >= memory.size() * sizeof(uint32_t))
                 break;
 
             uint32_t& inst = fetch();
+            exec = execute(inst);
 
-            if (!execute(inst))
+            if (!jump_flag)
                 increase_PC();
+            else
+                jump_flag = false;
+
+            if (stop_process_flag)
+                break;
         }
+
+        return exec;
     }
 
     //for testing
@@ -71,13 +83,13 @@ private:
     execute_inst execute_jalr;
     execute_inst execute_load;
     execute_inst execute_store;
-    execute_inst execute_system;
     execute_inst execute_fence;
-    int execute_branch(instD* dec_inst);
+    execute_inst execute_branch;
+    int execute_system(instD* dec_inst);
 
     void increase_PC(std::size_t value = sizeof(uint32_t)) { PC += value; }
-    std::size_t get_PC() const noexcept{ return PC; }
-    void set_PC(std::size_t value) { PC = value; }
+    uint32_t get_PC() const noexcept{ return PC; }
+    void set_PC(uint32_t value) { PC = value; }
 };
 
 }
