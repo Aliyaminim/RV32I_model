@@ -34,6 +34,8 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    int return_v = 0;
+
     try {
         std::size_t mem_size = (1ull << 32) - 1; //RV32I provides a 32-bit address space
         std::ofstream logstream("logfile.out");
@@ -46,7 +48,7 @@ int main(int argc, char **argv) {
         model_rv32i.dump_memory();
         #endif
 
-        model_rv32i.process();
+        return_v = model_rv32i.process();
 
     }
     catch(const std::runtime_error& err) {
@@ -54,5 +56,5 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    return 0;
+    return return_v;
 }
