@@ -23,4 +23,6 @@ add_subdirectory(tests)
 add_executable(main ./src/main.cpp)
 target_include_directories(main PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
+add_subdirectory(snippy_model)
+
 #cmake -DCMAKE_BUILD_TYPE=Debug
