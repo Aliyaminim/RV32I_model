@@ -11,6 +11,7 @@ instruction count to 38 total.*/
 #include <cassert>
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 #include "regfile.hpp"
 #include "memory.hpp"
 #include "instruction.hpp"
@@ -42,19 +43,25 @@ public:
     bool stop_process_flag = false;
     bool jump_flag = false;
 
+    int process_instr() {
+        uint32_t& inst = fetch();
+        int exec = execute(inst);
+
+        if (!jump_flag)
+            increase_PC();
+        else
+            jump_flag = false;
+
+        return exec;
+    }
+
     int process() {
         int exec = 0;
         for (;;) {
             if(PC >= memory.size() * sizeof(uint32_t))
                 break;
 
-            uint32_t& inst = fetch();
-            exec = execute(inst);
-
-            if (!jump_flag)
-                increase_PC();
-            else
-                jump_flag = false;
+            exec = process_instr();
 
             if (stop_process_flag)
                 break;
@@ -67,8 +74,18 @@ public:
     void write_to_reg(std::size_t reg, int32_t value) { regfile.write(reg, value); }
     int32_t read_reg(std::size_t reg) const { return regfile.read(reg); }
 
-    void write_to_mem(int32_t address, int32_t value) { memory.write(address, value); }
-    uint32_t& read_mem(int32_t address) { return memory.read(address); }
+    void write_to_mem(uint32_t address, int32_t value) { memory.write(address, value); }
+    uint32_t& read_mem(uint32_t address) { return memory.read(address); }
+
+    int8_t read_byte(uint32_t address) {
+        int8_t* elem_byte = ((int8_t*)memory.begin_ptr()) + address;
+        return *elem_byte;
+    }
+
+    void write_byte(uint32_t address, const char * Data) {
+        int8_t* elem_byte = ((int8_t*)memory.begin_ptr()) + address;
+        *elem_byte = *Data;
+    }
 
     void dump_memory() const { memory.dump(logstream); }
 
@@ -87,6 +104,7 @@ private:
     execute_inst execute_branch;
     int execute_system(instD* dec_inst);
 
+public:
     void increase_PC(std::size_t value = sizeof(uint32_t)) { PC += value; }
     uint32_t get_PC() const noexcept{ return PC; }
     void set_PC(uint32_t value) { PC = value; }
