@@ -2,12 +2,13 @@
 
 #include <cstdint>
 #include <array>
+#include <stdexcept>
 
 namespace rv32i_model {
 
 class Regfile final {
 /*  reg[0] = 0 (always)
-    reg[1] - return address for a call(что вернула функция)
+    reg[1] - return address for a call
     reg[5] - alternate link register
     reg[2] - stack pointer
 */
@@ -18,10 +19,10 @@ public:
     int32_t read(std::size_t i) const { return regs[i]; }
 
     void write(std::size_t i, int32_t value) {
-        if (i == 0)
-            throw std::runtime_error("Forbidden to change value x0");
-        else
-            regs[i] = value;
+        if ((i == 0) && (value != 0))
+            throw std::logic_error("Forbidden to change value x0, it's hardwired to 0");
+
+        regs[i] = value;
     }
 
     void dump() const {
