@@ -42,13 +42,14 @@ int main(int argc, char **argv) {
         rv32i_model::Processor model_rv32i(mem_size, logstream);
 
         std::vector<uint32_t> memory_image = get_memory_image(argv[1]);
+        std::size_t num_instr = memory_image.size();
         model_rv32i.load_input_to_memory(memory_image.begin(), memory_image.end());
 
         #ifdef DEBUG
         model_rv32i.dump_memory();
         #endif
 
-        return_v = model_rv32i.process();
+        return_v = model_rv32i.process(num_instr);
 
     }
     catch(const std::runtime_error& err) {
