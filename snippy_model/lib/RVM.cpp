@@ -19,8 +19,13 @@ public:
 
     int executeInstr() { return proc.process_instr(); }
 
-    int8_t readByte(uint32_t addr) { return proc.read_byte(addr); }
-    void writeByte(uint32_t addr, const char * Data) { proc.write_byte(addr, Data); }
+    void write(uint32_t address, std::size_t size, const char * data) {
+        proc.write(address, size, data);
+    }
+
+    void read(uint32_t address, std::size_t size, char * data) {
+        proc.read(address, size, data);
+    }
 
     uint64_t readPC() { return proc.get_PC(); }
     void setPC(uint64_t NewPC) { proc.set_PC(NewPC); }
@@ -42,12 +47,43 @@ struct RVMState {
 RVMState *rvm_modelCreate(const RVMConfig *config) {
     SnippyRISCVSimulator* model;
     if (strlen(config->LogFilePath) == 0)
-        model = new SnippyRISCVSimulator(config->RamSize);
+        model = new SnippyRISCVSimulator(config->RomSize + config->RomStart);
     else
-        model = new SnippyRISCVSimulator(config->RamSize, config->LogFilePath);
+        model = new SnippyRISCVSimulator(config->RomSize + config->RomStart, config->LogFilePath);
 
     return new RVMState(*config, model);
+}
 
+RVMRegT rvm_readFReg(const RVMState *State, RVMFReg Reg) {
+    throw std::runtime_error("rvm_readFReg Not implemented!");
+}
+
+void rvm_setFReg(RVMState *State, RVMFReg Reg, RVMRegT Value) {
+    throw std::runtime_error("rvm_setFReg Not implemented!");
+}
+
+RVMRegT rvm_readCSRReg(const RVMState *State, unsigned Reg) {
+    // throw std::runtime_error("rvm_readCSRReg Not implemented!");
+    return 0;
+}
+
+void rvm_setCSRReg(RVMState *State, unsigned Reg, RVMRegT Value) {
+    // throw std::runtime_error("rvm_setCSRReg Not implemented!");
+    return;
+}
+
+int rvm_readVReg(const RVMState *State, RVMVReg Reg, char *Data,
+                 size_t MaxSize) {
+    throw std::runtime_error("rvm_readVReg Not implemented!");
+}
+
+int rvm_setVReg(RVMState *State, RVMVReg Reg, const char *Data,
+                size_t DataSize) {
+    throw std::runtime_error("rvm_setVReg Not implemented!");
+}
+
+int rvm_queryCallbackSupportPresent() {
+    throw std::runtime_error("rvm_queryCallbackSupportPresent Not implemented!");
 }
 
 void rvm_modelDestroy(RVMState *State) {
@@ -72,16 +108,16 @@ void rvm_readMem(const RVMState *State, uint64_t Addr, size_t Count,
                  char *Data) {
     if (State == NULL)
         throw std::runtime_error("There is no existing state to read from memory");
-    for (auto Idx = 0; Idx < Count; ++Idx)
-        Data[Idx] = State->Model->readByte(Addr + Idx);
+
+    State->Model->read(Addr, Count, Data);
 }
 
 void rvm_writeMem(RVMState *State, uint64_t Addr, size_t Count,
                   const char *Data) {
     if (State == NULL)
         throw std::runtime_error("There is no existing state to write to memory");
-    for (auto Idx = 0; Idx < Count; ++Idx)
-        State->Model->writeByte(Addr + Idx, Data + Idx);
+
+    State->Model->write(Addr, Count, Data);
 }
 
 uint64_t rvm_readPC(const RVMState *State) {
