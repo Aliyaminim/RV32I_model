@@ -12,6 +12,7 @@ instruction count to 38 total.*/
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+#include <iterator>
 #include "regfile.hpp"
 #include "memory.hpp"
 #include "instruction.hpp"
@@ -35,7 +36,7 @@ public:
     }
 
 private:
-    uint32_t& fetch() { return read_mem(PC); }
+    uint32_t& fetch() { return read(PC); }
 
     int execute(uint32_t& inst);
 
@@ -55,11 +56,9 @@ public:
         return exec;
     }
 
-    int process() {
+    int process(std::size_t num_instr = 0) {
         int exec = 0;
-        for (;;) {
-            if(PC >= memory.size() * sizeof(uint32_t))
-                break;
+        for (; (PC/sizeof(uint32_t)) < num_instr;) {
 
             exec = process_instr();
 
@@ -74,18 +73,16 @@ public:
     void write_to_reg(std::size_t reg, int32_t value) { regfile.write(reg, value); }
     int32_t read_reg(std::size_t reg) const { return regfile.read(reg); }
 
-    void write_to_mem(uint32_t address, int32_t value) { memory.write(address, value); }
-    uint32_t& read_mem(uint32_t address) { return memory.read(address); }
-
-    int8_t read_byte(uint32_t address) {
-        int8_t* elem_byte = ((int8_t*)memory.begin_ptr()) + address;
-        return *elem_byte;
+    void write(uint32_t address, std::size_t size, const char * data) {
+        memory.write(address, size, data);
     }
 
-    void write_byte(uint32_t address, const char * Data) {
-        int8_t* elem_byte = ((int8_t*)memory.begin_ptr()) + address;
-        *elem_byte = *Data;
+    void read(uint32_t address, std::size_t size, char * data) {
+        memory.read(address, size, data);
     }
+
+    void write(uint32_t address, int32_t value) { memory.write(address, 4, reinterpret_cast<char*>(&value)); }
+    uint32_t& read(uint32_t address) { return memory.read(address); }
 
     void dump_memory() const { memory.dump(logstream); }
 
