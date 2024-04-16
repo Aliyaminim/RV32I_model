@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <unistd.h>
+#include <stdexcept>
 #include "processor.hpp"
 #include "instruction.hpp"
 #include "tools.hpp"
@@ -90,7 +91,7 @@ int Processor::execute(uint32_t& inst) {
             execute_fence(dec_inst.get());
             break;
         default:
-            throw std::runtime_error ("Unknown instruction: PC = 0x" + num2hex(PC));
+            throw std::runtime_error ("Unknown instruction: PC = 0x" + num2hex(PC) + " inst = 0x" + num2hex(inst));
             break;
     }
 
@@ -221,7 +222,9 @@ void Processor::execute_op(instD* dec_inst) {
 void Processor::execute_jal(instD* dec_inst) {
     logstream << "JAL" << std::endl;
     auto[opc, rd, imm] = *dynamic_cast<instD_J*>(dec_inst);
-    regfile.write(rd, get_PC() + 4);
+
+    if (rd != 0) //sometimes dest is not required
+        regfile.write(rd, get_PC() + 4);
 
     if ( !(imm & 0x3) ) {
         // The address is 4-byte aligned here
@@ -303,31 +306,44 @@ void Processor::execute_load(instD* dec_inst) {
     auto[opc, rd, rs1, funct3, imm] = *dynamic_cast<instD_I*>(dec_inst);
 
     uint32_t effective_address = regfile.read(rs1) + imm;
-    uint32_t value_tmp = memory.read(effective_address);
+    uint32_t value_tmp;
+    uint8_t value_lb;
+    uint16_t value_lh;
+    uint32_t value_lw;
     int32_t value = 0;
 
     switch(static_cast<Funct3>(funct3)) {
         case Funct3::VAR_0: //LB
             logstream << "LB" << std::endl;
+            read(effective_address, 1, reinterpret_cast<char*>(&value_lb));
+            value_tmp = value_lb;
             value_tmp = (value_tmp & 0xFF) + ((value_tmp & 0x80) ? 0xFFFFFF00 : 0x0);
             value = (int32_t)value_tmp;
             break;
         case Funct3::VAR_1: //LH
             logstream << "LH" << std::endl;
+            read(effective_address, 2, reinterpret_cast<char*>(&value_lh));
+            value_tmp = value_lh;
             value_tmp = (value_tmp & 0xFFFF) + ((value_tmp & 0x8000) ? 0xFFFF0000 : 0x0);
             value = (int32_t)value_tmp;
             break;
         case Funct3::VAR_2: //LW
             logstream << "LW" << std::endl;
+            read(effective_address, 4, reinterpret_cast<char*>(&value_lw));
+            value_tmp = value_lw;
             value = (int32_t)value_tmp;
             break;
         case Funct3::VAR_4: //LBU
             logstream << "LBU" << std::endl;
+            read(effective_address, 1, reinterpret_cast<char*>(&value_lb));
+            value_tmp = value_lb;
             value_tmp = (value_tmp & 0xFF);
             value = (int32_t)value_tmp;
             break;
         case Funct3::VAR_5: //LHU
             logstream << "LHU" << std::endl;
+            read(effective_address, 2, reinterpret_cast<char*>(&value_lh));
+            value_tmp = value_lh;
             value_tmp = (value_tmp & 0xFFFF);
             value = (int32_t)value_tmp;
             break;
@@ -348,15 +364,17 @@ void Processor::execute_store(instD* dec_inst) {
     switch(static_cast<Funct3>(funct3)) {
         case Funct3::VAR_0: //SB
             logstream << "SB" << std::endl;
-            memory.write(effective_address, value & 0xFF);
+            value = (value & 0xFF);
+            write(effective_address, 1, reinterpret_cast<char*>(&value));
             break;
         case Funct3::VAR_1: //SH
             logstream << "SH" << std::endl;
-            memory.write(effective_address, value & 0xFFFF);
+            value = (value & 0xFFFF);
+            write(effective_address, 2, reinterpret_cast<char*>(&value));
             break;
         case Funct3::VAR_2: //SW
             logstream << "SW" << std::endl;
-            memory.write(effective_address, value);
+            write(effective_address, value);
             break;
         default:
             throw std::runtime_error ("Unknown store instruction: PC = 0x" + num2hex(PC));
@@ -387,11 +405,11 @@ int Processor::execute_system(instD* dec_inst) {
 
         switch (syscall_type) {
             case syscall_READ:
-                status = read(fd, buf, size);
+                status = ::read(fd, buf, size);
                 return status;
                 break;
             case syscall_WRITE:
-                status = write(fd, buf, size);
+                status = ::write(fd, buf, size);
                 return status;
                 break;
             case syscall_EXIT:
