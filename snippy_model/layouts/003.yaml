@@ -1,0 +1,38 @@
+# Unconditional Jumps and Conditional Branches
+
+options:
+  march: riscv32
+  num-instrs: 2
+  model-plugin: /home/aliya/programming/cpp/RV32I_model/build/snippy_model/libsnippy_model.so
+  trace-log: /home/aliya/programming/cpp/RV32I_model/build/logfile.txt
+  reserved-regs-list: [sp, gp, x0]
+
+sections:
+  - name:      text
+    VMA:     0x210000
+    SIZE:    0x100000
+    LMA:     0x210000
+    ACCESS:  rx
+  - name:    data
+    VMA:     0x100000
+    SIZE:    0x100000
+    LMA:     0x100000
+    ACCESS:  rw
+
+histogram:
+
+  - [BEQ,   2.0]
+  - [BNE,   3.0]
+  - [BLT,   1.0]
+  - [BGEU,  1.0]
+  - [BLTU,  1.0]
+  - [BGE,   2.0]
+
+  - [JAL,   2.0]
+  - [JALR,  2.0]
+
+  - [ADDI,  1.0]
+  - [ADD,   1.0]
+  - [SUB,   1.0]
+
+#./llvm-snippy ../cpp/RV32I_model/snippy_model/layouts/003.yaml -seed=1713467599727699931

@@ -1,0 +1,31 @@
+# Integer Register-Immediate Instructions
+
+options:
+  march: riscv32
+  num-instrs: 100
+  model-plugin: /home/aliya/programming/cpp/RV32I_model/build/snippy_model/libsnippy_model.so
+  trace-log: /home/aliya/programming/cpp/RV32I_model/build/logfile.txt
+  reserved-regs-list: [sp, gp, ra, x0]
+
+sections:
+  - name:      text
+    VMA:     0x210000
+    SIZE:    0x100000
+    LMA:     0x210000
+    ACCESS:  rx
+  - name:    data
+    VMA:     0x100000
+    SIZE:    0x100000
+    LMA:     0x100000
+    ACCESS:  rw
+
+histogram:
+
+  - [ADDI,  1.0]
+  - [SLTI,  1.0]
+  - [SLTIU, 1.0]
+  - [XORI,  1.0]
+  - [ORI,   1.0]
+  - [ANDI,  1.0]
+  - [LUI,   1.0]
+  - [AUIPC, 1.0]
