@@ -19,10 +19,8 @@ public:
     int32_t read(std::size_t i) const { return regs[i]; }
 
     void write(std::size_t i, int32_t value) {
-        if ((i == 0) && (value != 0))
-            throw std::logic_error("Forbidden to change value x0, it's hardwired to 0");
-
-        regs[i] = value;
+        if (i != 0)
+            regs[i] = value;
     }
 
     void dump() const {
