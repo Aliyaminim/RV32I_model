@@ -29,6 +29,9 @@ public:
     Processor(std::size_t memory_size, std::ostream& _logstream_ = std::cout) : regfile(), memory(memory_size),
         PC(0), logstream(_logstream_) {}
 
+    Processor(uint32_t memory_start, std::size_t memory_size, std::ostream& _logstream_ = std::cout) :
+        regfile(), memory(memory_start, memory_size), PC(0), logstream(_logstream_) {}
+
     template <typename It>
     void load_input_to_memory(It input_start, It input_fin, uint32_t start_addr = 0) {
         memory.fill(input_start, input_fin);

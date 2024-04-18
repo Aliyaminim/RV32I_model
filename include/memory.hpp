@@ -10,8 +10,15 @@ namespace rv32i_model {
 class Memory final {
     std::vector<uint32_t> mem;
     std::size_t size_;
+    uint32_t start_address;
 public:
-    Memory(std::size_t memory_size /*in bytes*/) : size_(memory_size) {
+    Memory(std::size_t memory_size /*in bytes*/) : size_(memory_size), start_address(0) {
+        mem.resize(memory_size / sizeof(uint32_t) + 1);
+    }
+
+    Memory(uint32_t memory_start, std::size_t memory_size /*in bytes*/) :
+        size_(memory_size), start_address(memory_start)
+    {
         mem.resize(memory_size / sizeof(uint32_t) + 1);
     }
 
@@ -20,12 +27,12 @@ public:
     std::size_t size() const { return size_; }
 
     uint32_t& read(uint32_t effective_address) {
-        if ((effective_address + sizeof(int32_t)) >= size_)
+        if ((effective_address + sizeof(int32_t)) >= (size_ + start_address))
             throw std::out_of_range("Cannot read from memory, invalid address");
 
         if ( !(effective_address & 0x3) ) {
             // The address is 4-byte aligned here
-            std::size_t addr_2index = effective_address / sizeof(uint32_t);
+            std::size_t addr_2index = (effective_address - start_address) / sizeof(uint32_t);
             #ifdef DEBUG
             std::cout << mem[addr_2index] << std::endl;
             #endif
@@ -34,23 +41,23 @@ public:
             throw std::runtime_error ("An address-misaligned exception");
     }
 
-    void read(uint32_t address, std::size_t size_, char * data) {
-        if ((address + size_ * sizeof(char)) >= size_)
+    void read(uint32_t address, std::size_t size_r, char * data) {
+        if ((address + size_r * sizeof(char)) >= (size_ + start_address))
             throw std::out_of_range("Cannot read from memory, invalid address");
 
-        char* elem_byte = static_cast<char*>(begin_ptr()) + address;
+        char* elem_byte = static_cast<char*>(begin_ptr()) + (address - start_address);
 
-        for (std::size_t i = 0; i < size_; ++i)
+        for (std::size_t i = 0; i < size_r; ++i)
             data[i] = elem_byte[i];
     }
 
-    void write(uint32_t address, std::size_t size_, const char * data) {
-        if ((address + size_ * sizeof(char)) >= size_)
+    void write(uint32_t address, std::size_t size_w, const char * data) {
+        if ((address + size_w * sizeof(char)) >= (size_ + start_address))
             throw std::out_of_range("Cannot write to memory, invalid address");
 
-        char* elem_byte = static_cast<char*>(begin_ptr()) + address;
+        char* elem_byte = static_cast<char*>(begin_ptr()) + (address - start_address);
 
-        for (std::size_t i = 0; i < size_; ++i)
+        for (std::size_t i = 0; i < size_w; ++i)
             elem_byte[i] = data[i];
     }
 

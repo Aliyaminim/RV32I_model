@@ -12,10 +12,10 @@ class SnippyRISCVSimulator final {
     rv32i_model::Processor proc;
 
 public:
-    SnippyRISCVSimulator(std::size_t memory_size, const char *LogFilePath) : LogFile(LogFilePath),
-                                                            proc(memory_size, LogFile.value()) {}
+    SnippyRISCVSimulator(uint32_t memory_start, std::size_t memory_size, const char *LogFilePath) : LogFile(LogFilePath),
+                                                            proc(memory_start, memory_size, LogFile.value()) {}
 
-    explicit SnippyRISCVSimulator(std::size_t memory_size) : proc(memory_size) {}
+    SnippyRISCVSimulator(uint32_t memory_start, std::size_t memory_size) : proc(memory_start, memory_size) {}
 
     int executeInstr() { return proc.process_instr(); }
 
@@ -46,10 +46,23 @@ struct RVMState {
 
 RVMState *rvm_modelCreate(const RVMConfig *config) {
     SnippyRISCVSimulator* model;
+
+    auto memory_start = ((config->RomStart < config->RamStart) ? config->RomStart : config->RamStart);
+    auto RomEnd = config->RomStart + config->RomSize;
+    auto RamEnd = config->RamStart + config->RamSize;
+    auto memory_end = ((RomEnd > RamEnd) ? RomEnd : RamEnd);
+
     if (strlen(config->LogFilePath) == 0)
-        model = new SnippyRISCVSimulator(config->RomSize + config->RomStart);
+        model = new SnippyRISCVSimulator(memory_start, memory_end - memory_start);
     else
-        model = new SnippyRISCVSimulator(config->RomSize + config->RomStart, config->LogFilePath);
+        model = new SnippyRISCVSimulator(memory_start, memory_end - memory_start, config->LogFilePath);
+
+        #ifdef DEBUG
+        std::cout << "config->RamSize " << config->RamSize << std::endl;
+        std::cout << "config->RamStart " << config->RamStart << std::endl;
+        std::cout << "config->RomSize " << config->RomSize << std::endl;
+        std::cout << "config->RomStart " << config->RomStart << std::endl;
+        #endif
 
     return new RVMState(*config, model);
 }
