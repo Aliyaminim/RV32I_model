@@ -33,9 +33,6 @@ public:
         if ( !(effective_address & 0x3) ) {
             // The address is 4-byte aligned here
             std::size_t addr_2index = (effective_address - start_address) / sizeof(uint32_t);
-            #ifdef DEBUG
-            std::cout << mem[addr_2index] << std::endl;
-            #endif
             return mem[addr_2index];
         } else
             throw std::runtime_error ("An address-misaligned exception");
