@@ -1,12 +1,12 @@
 #pragma once
 
-#include <cstdio>
+#include <cstdint>
 
 namespace rv32i_model {
 
 class instD {
 public:
-    virtual ~instD() = default;
+    virtual ~instD() {};
 };
 
 class instD_R final : public instD {
