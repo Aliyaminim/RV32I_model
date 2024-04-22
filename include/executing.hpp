@@ -109,6 +109,9 @@ void Processor::execute_op_imm(instD* dec_inst) {
             else
                 regfile.write(rd, imm + regfile.read(rs1));
             break;
+        case Funct3::VAR_1:
+            throw std::runtime_error("SLLI aren't implemented: PC = 0x" + num2hex(PC));
+            break;
         case Funct3::VAR_2: //slti
             logstream << "SLTI" << std::endl;
             regfile.write(rd, ((int32_t)regfile.read(rs1) < (int32_t)imm));
@@ -120,6 +123,9 @@ void Processor::execute_op_imm(instD* dec_inst) {
         case Funct3::VAR_4: //xori
             logstream << "XORI" << std::endl;
             regfile.write(rd, ((uint32_t)regfile.read(rs1) ^ (uint32_t)imm));
+            break;
+        case Funct3::VAR_5:
+            throw std::runtime_error("SRLI or SRAI aren't implemented: PC = 0x" + num2hex(PC));
             break;
         case Funct3::VAR_6: //ori
             logstream << "ORI" << std::endl;
@@ -254,7 +260,6 @@ void Processor::execute_jalr(instD* dec_inst) {
 
 void Processor::execute_branch(instD* dec_inst) {
     auto[opc, rs1, rs2, funct3, imm] = *dynamic_cast<instD_B*>(dec_inst);
-    bool jump_flag = false;
 
     switch(static_cast<Funct3>(funct3)) {
         case Funct3::VAR_0: //beq
