@@ -4,8 +4,8 @@
 #include <sstream>
 
 template <typename T>
-static std::string num2hex(T num) {
+std::string num2hex(T num) {
     std::stringstream stream;
     stream << std::hex << num;
-    return std::string(stream.str());
+    return stream.str();
 }
