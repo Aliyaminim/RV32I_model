@@ -1,5 +1,6 @@
 #include <optional>
 #include <cstring>
+#include <stdexcept>
 #include "RVM.h"
 #include "rv32i_model.hpp"
 
@@ -45,6 +46,7 @@ struct RVMState {
 };
 
 RVMState *rvm_modelCreate(const RVMConfig *config) {
+    try {
     SnippyRISCVSimulator* model;
 
     auto memory_start = ((config->RomStart < config->RamStart) ? config->RomStart : config->RamStart);
@@ -65,14 +67,41 @@ RVMState *rvm_modelCreate(const RVMConfig *config) {
         #endif
 
     return new RVMState(*config, model);
+    }
+    catch(const std::exception& err) {
+        std::cerr << err.what() << std::endl;
+    }
+    catch(...) {
+        std::cerr << "Unknown error" << std::endl;
+    }
+    std::terminate();
 }
 
 RVMRegT rvm_readFReg(const RVMState *State, RVMFReg Reg) {
+    try {
     throw std::runtime_error("rvm_readFReg Not implemented!");
+    }
+    catch(const std::exception& err) {
+        std::cerr << err.what() << std::endl;
+    }
+    catch(...) {
+        std::cerr << "Unknown error" << std::endl;
+    }
+    std::terminate();
 }
 
 void rvm_setFReg(RVMState *State, RVMFReg Reg, RVMRegT Value) {
+    try {
     throw std::runtime_error("rvm_setFReg Not implemented!");
+    }
+    catch(const std::exception& err) {
+        std::cerr << err.what() << std::endl;
+    }
+    catch(...) {
+        std::cerr << "Unknown error" << std::endl;
+    }
+    std::terminate();
+
 }
 
 RVMRegT rvm_readCSRReg(const RVMState *State, unsigned Reg) {
@@ -87,77 +116,196 @@ void rvm_setCSRReg(RVMState *State, unsigned Reg, RVMRegT Value) {
 
 int rvm_readVReg(const RVMState *State, RVMVReg Reg, char *Data,
                  size_t MaxSize) {
+    try {
     throw std::runtime_error("rvm_readVReg Not implemented!");
+    }
+    catch(const std::exception& err) {
+        std::cerr << err.what() << std::endl;
+    }
+    catch(...) {
+        std::cerr << "Unknown error" << std::endl;
+    }
+    std::terminate();
 }
 
 int rvm_setVReg(RVMState *State, RVMVReg Reg, const char *Data,
                 size_t DataSize) {
+    try {
     throw std::runtime_error("rvm_setVReg Not implemented!");
+    }
+    catch(const std::exception& err) {
+        std::cerr << err.what() << std::endl;
+    }
+    catch(...) {
+        std::cerr << "Unknown error" << std::endl;
+    }
+    std::terminate();
 }
 
 int rvm_queryCallbackSupportPresent() {
+    try {
     throw std::runtime_error("rvm_queryCallbackSupportPresent Not implemented!");
+    }
+    catch(const std::exception& err) {
+        std::cerr << err.what() << std::endl;
+    }
+    catch(...) {
+        std::cerr << "Unknown error" << std::endl;
+    }
+    std::terminate();
 }
 
 void rvm_modelDestroy(RVMState *State) {
+    try {
     if (State == NULL)
         throw std::runtime_error("There is no existing state to destroy model");
     State->Model->~SnippyRISCVSimulator();
+    }
+    catch(const std::exception& err) {
+        std::cerr << err.what() << std::endl;
+    }
+    catch(...) {
+        std::cerr << "Unknown error" << std::endl;
+    }
+    std::terminate();
 }
 
 const RVMConfig *rvm_getModelConfig(const RVMState *State) {
+    try {
     if (State == NULL)
         throw std::runtime_error("There is no existing state to get ModelConfig");
     return &(State->Config);
+    }
+    catch(const std::exception& err) {
+        std::cerr << err.what() << std::endl;
+    }
+    catch(...) {
+        std::cerr << "Unknown error" << std::endl;
+    }
+    std::terminate();
 }
 
 int rvm_executeInstr(RVMState *State) {
+    try {
     if (State == NULL)
         throw std::runtime_error("There is no existing state to execute instruction");
     return State->Model->executeInstr();
+    }
+    catch(const std::exception& err) {
+        std::cerr << err.what() << std::endl;
+    }
+    catch(...) {
+        std::cerr << "Unknown error" << std::endl;
+    }
+    std::terminate();
 }
 
 void rvm_readMem(const RVMState *State, uint64_t Addr, size_t Count,
                  char *Data) {
+    try {
     if (State == NULL)
         throw std::runtime_error("There is no existing state to read from memory");
 
     State->Model->read(Addr, Count, Data);
+    }
+    catch(const std::exception& err) {
+        std::cerr << err.what() << std::endl;
+    }
+    catch(...) {
+        std::cerr << "Unknown error" << std::endl;
+    }
+    std::terminate();
 }
 
 void rvm_writeMem(RVMState *State, uint64_t Addr, size_t Count,
                   const char *Data) {
+    try {
     if (State == NULL)
         throw std::runtime_error("There is no existing state to write to memory");
 
     State->Model->write(Addr, Count, Data);
+    }
+    catch(const std::exception& err) {
+        std::cerr << err.what() << std::endl;
+    }
+    catch(...) {
+        std::cerr << "Unknown error" << std::endl;
+    }
+    std::terminate();
 }
 
 uint64_t rvm_readPC(const RVMState *State) {
+    try {
     if (State == NULL)
         throw std::runtime_error("There is no existing state to read PC");
     return State->Model->readPC();
+    }
+    catch(const std::exception& err) {
+        std::cerr << err.what() << std::endl;
+    }
+    catch(...) {
+        std::cerr << "Unknown error" << std::endl;
+    }
+    std::terminate();
 }
 
 void rvm_setPC(RVMState *State, uint64_t NewPC) {
+    try {
     if (State == NULL)
         throw std::runtime_error("There is no existing state to set PC");
     State->Model->setPC(NewPC);
+    }
+    catch(const std::exception& err) {
+        std::cerr << err.what() << std::endl;
+    }
+    catch(...) {
+        std::cerr << "Unknown error" << std::endl;
+    }
+    std::terminate();
 }
 
 RVMRegT rvm_readXReg(const RVMState *State, RVMXReg Reg) {
+    try {
     if (State == NULL)
         throw std::runtime_error("There is no existing state to read XReg");
     return State->Model->readXReg(Reg);
+    }
+    catch(const std::exception& err) {
+        std::cerr << err.what() << std::endl;
+    }
+    catch(...) {
+        std::cerr << "Unknown error" << std::endl;
+    }
+    std::terminate();
 }
 
 void rvm_setXReg(RVMState *State, RVMXReg Reg, RVMRegT Value) {
+    try {
     if (State == NULL)
         throw std::runtime_error("There is no existing state to write to XReg");
     State->Model->setXReg(Reg, Value);
+    }
+    catch(const std::exception& err) {
+        std::cerr << err.what() << std::endl;
+    }
+    catch(...) {
+        std::cerr << "Unknown error" << std::endl;
+    }
+    std::terminate();
 }
 
-void rvm_logMessage(const char *Message) { std::cout << Message; }
+void rvm_logMessage(const char *Message) {
+    try {
+    std::cout << Message << std::endl;
+    }
+    catch(const std::exception& err) {
+        std::cerr << err.what() << std::endl;
+    }
+    catch(...) {
+        std::cerr << "Unknown error" << std::endl;
+    }
+    std::terminate();
+}
 
 #ifdef __cplusplus
 }
