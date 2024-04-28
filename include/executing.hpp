@@ -110,7 +110,8 @@ void Processor::execute_op_imm(instD* dec_inst) {
                 regfile.write(rd, imm + regfile.read(rs1));
             break;
         case Funct3::VAR_1:
-            throw std::runtime_error("SLLI aren't implemented: PC = 0x" + num2hex(PC));
+            logstream << "SLLI" << std::endl;
+            regfile.write(rd, regfile.read(rs1) << (imm & 0x1F));
             break;
         case Funct3::VAR_2: //slti
             logstream << "SLTI" << std::endl;
@@ -125,7 +126,13 @@ void Processor::execute_op_imm(instD* dec_inst) {
             regfile.write(rd, ((uint32_t)regfile.read(rs1) ^ (uint32_t)imm));
             break;
         case Funct3::VAR_5:
-            throw std::runtime_error("SRLI or SRAI aren't implemented: PC = 0x" + num2hex(PC));
+            if ((imm >> 5) == 0) {
+                logstream << "SRLI" << std::endl;
+                regfile.write(rd, (uint32_t)regfile.read(rs1) >> (imm & 0x1F));
+            } else {
+                logstream << "SRAI" << std::endl;
+                regfile.write(rd, (int32_t)regfile.read(rs1) >> (imm & 0x1F));
+            }
             break;
         case Funct3::VAR_6: //ori
             logstream << "ORI" << std::endl;
