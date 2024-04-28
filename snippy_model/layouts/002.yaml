@@ -29,3 +29,6 @@ histogram:
   - [ANDI,  1.0]
   - [LUI,   1.0]
   - [AUIPC, 1.0]
+  - [SLLI,  1.0]
+  - [SRLI,  1.0]
+  - [SRAI,  1.0]
