@@ -70,11 +70,12 @@ RVMState *rvm_modelCreate(const RVMConfig *config) {
     }
     catch(const std::exception& err) {
         std::cerr << err.what() << std::endl;
+        std::terminate();
     }
     catch(...) {
         std::cerr << "Unknown error" << std::endl;
+        std::terminate();
     }
-    std::terminate();
 }
 
 RVMRegT rvm_readFReg(const RVMState *State, RVMFReg Reg) {
@@ -83,11 +84,12 @@ RVMRegT rvm_readFReg(const RVMState *State, RVMFReg Reg) {
     }
     catch(const std::exception& err) {
         std::cerr << err.what() << std::endl;
+        std::terminate();
     }
     catch(...) {
         std::cerr << "Unknown error" << std::endl;
+        std::terminate();
     }
-    std::terminate();
 }
 
 void rvm_setFReg(RVMState *State, RVMFReg Reg, RVMRegT Value) {
@@ -96,12 +98,12 @@ void rvm_setFReg(RVMState *State, RVMFReg Reg, RVMRegT Value) {
     }
     catch(const std::exception& err) {
         std::cerr << err.what() << std::endl;
+        std::terminate();
     }
     catch(...) {
         std::cerr << "Unknown error" << std::endl;
+        std::terminate();
     }
-    std::terminate();
-
 }
 
 RVMRegT rvm_readCSRReg(const RVMState *State, unsigned Reg) {
@@ -121,11 +123,12 @@ int rvm_readVReg(const RVMState *State, RVMVReg Reg, char *Data,
     }
     catch(const std::exception& err) {
         std::cerr << err.what() << std::endl;
+        std::terminate();
     }
     catch(...) {
         std::cerr << "Unknown error" << std::endl;
+        std::terminate();
     }
-    std::terminate();
 }
 
 int rvm_setVReg(RVMState *State, RVMVReg Reg, const char *Data,
@@ -135,11 +138,12 @@ int rvm_setVReg(RVMState *State, RVMVReg Reg, const char *Data,
     }
     catch(const std::exception& err) {
         std::cerr << err.what() << std::endl;
+        std::terminate();
     }
     catch(...) {
         std::cerr << "Unknown error" << std::endl;
+        std::terminate();
     }
-    std::terminate();
 }
 
 int rvm_queryCallbackSupportPresent() {
@@ -148,11 +152,12 @@ int rvm_queryCallbackSupportPresent() {
     }
     catch(const std::exception& err) {
         std::cerr << err.what() << std::endl;
+        std::terminate();
     }
     catch(...) {
         std::cerr << "Unknown error" << std::endl;
+        std::terminate();
     }
-    std::terminate();
 }
 
 void rvm_modelDestroy(RVMState *State) {
@@ -163,11 +168,12 @@ void rvm_modelDestroy(RVMState *State) {
     }
     catch(const std::exception& err) {
         std::cerr << err.what() << std::endl;
+        std::terminate();
     }
     catch(...) {
         std::cerr << "Unknown error" << std::endl;
+        std::terminate();
     }
-    std::terminate();
 }
 
 const RVMConfig *rvm_getModelConfig(const RVMState *State) {
@@ -178,11 +184,12 @@ const RVMConfig *rvm_getModelConfig(const RVMState *State) {
     }
     catch(const std::exception& err) {
         std::cerr << err.what() << std::endl;
+        std::terminate();
     }
     catch(...) {
         std::cerr << "Unknown error" << std::endl;
+        std::terminate();
     }
-    std::terminate();
 }
 
 int rvm_executeInstr(RVMState *State) {
@@ -193,11 +200,12 @@ int rvm_executeInstr(RVMState *State) {
     }
     catch(const std::exception& err) {
         std::cerr << err.what() << std::endl;
+        std::terminate();
     }
     catch(...) {
         std::cerr << "Unknown error" << std::endl;
+        std::terminate();
     }
-    std::terminate();
 }
 
 void rvm_readMem(const RVMState *State, uint64_t Addr, size_t Count,
@@ -210,11 +218,12 @@ void rvm_readMem(const RVMState *State, uint64_t Addr, size_t Count,
     }
     catch(const std::exception& err) {
         std::cerr << err.what() << std::endl;
+        std::terminate();
     }
     catch(...) {
         std::cerr << "Unknown error" << std::endl;
+        std::terminate();
     }
-    std::terminate();
 }
 
 void rvm_writeMem(RVMState *State, uint64_t Addr, size_t Count,
@@ -227,11 +236,12 @@ void rvm_writeMem(RVMState *State, uint64_t Addr, size_t Count,
     }
     catch(const std::exception& err) {
         std::cerr << err.what() << std::endl;
+        std::terminate();
     }
     catch(...) {
         std::cerr << "Unknown error" << std::endl;
+        std::terminate();
     }
-    std::terminate();
 }
 
 uint64_t rvm_readPC(const RVMState *State) {
@@ -242,11 +252,12 @@ uint64_t rvm_readPC(const RVMState *State) {
     }
     catch(const std::exception& err) {
         std::cerr << err.what() << std::endl;
+        std::terminate();
     }
     catch(...) {
         std::cerr << "Unknown error" << std::endl;
+        std::terminate();
     }
-    std::terminate();
 }
 
 void rvm_setPC(RVMState *State, uint64_t NewPC) {
@@ -257,11 +268,12 @@ void rvm_setPC(RVMState *State, uint64_t NewPC) {
     }
     catch(const std::exception& err) {
         std::cerr << err.what() << std::endl;
+        std::terminate();
     }
     catch(...) {
         std::cerr << "Unknown error" << std::endl;
+        std::terminate();
     }
-    std::terminate();
 }
 
 RVMRegT rvm_readXReg(const RVMState *State, RVMXReg Reg) {
@@ -272,11 +284,12 @@ RVMRegT rvm_readXReg(const RVMState *State, RVMXReg Reg) {
     }
     catch(const std::exception& err) {
         std::cerr << err.what() << std::endl;
+        std::terminate();
     }
     catch(...) {
         std::cerr << "Unknown error" << std::endl;
+        std::terminate();
     }
-    std::terminate();
 }
 
 void rvm_setXReg(RVMState *State, RVMXReg Reg, RVMRegT Value) {
@@ -287,11 +300,12 @@ void rvm_setXReg(RVMState *State, RVMXReg Reg, RVMRegT Value) {
     }
     catch(const std::exception& err) {
         std::cerr << err.what() << std::endl;
+        std::terminate();
     }
     catch(...) {
         std::cerr << "Unknown error" << std::endl;
+        std::terminate();
     }
-    std::terminate();
 }
 
 void rvm_logMessage(const char *Message) {
@@ -300,11 +314,12 @@ void rvm_logMessage(const char *Message) {
     }
     catch(const std::exception& err) {
         std::cerr << err.what() << std::endl;
+        std::terminate();
     }
     catch(...) {
         std::cerr << "Unknown error" << std::endl;
+        std::terminate();
     }
-    std::terminate();
 }
 
 #ifdef __cplusplus
