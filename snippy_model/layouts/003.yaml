@@ -7,8 +7,6 @@ options:
   trace-log: /home/aliya/programming/cpp/RV32I_model/build/logfile.txt
   reserved-regs-list: [sp, gp]
 
-#./llvm-snippy ../cpp/RV32I_model/snippy_model/layouts/003.yaml -seed=1713467599727699931
-
 sections:
   - name:      text
     VMA:     0x210000
