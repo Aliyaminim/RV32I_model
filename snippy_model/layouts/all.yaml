@@ -2,12 +2,10 @@
 
 options:
   march: riscv32
-  num-instrs: 1000
+  num-instrs: 10000
   model-plugin: /home/aliya/programming/cpp/RV32I_model/build/snippy_model/libsnippy_model.so
   trace-log: /home/aliya/programming/cpp/RV32I_model/build/logfile.txt
   reserved-regs-list: [sp, gp]
-
-#./llvm-snippy ../cpp/RV32I_model/snippy_model/layouts/all.yaml -seed=1713816105040494672
 
 sections:
   - name:      text
