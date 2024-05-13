@@ -4,7 +4,7 @@ options:
   march: riscv32
   num-instrs: 1000
   model-plugin: /home/aliya/programming/cpp/RV32I_model/build/snippy_model/libsnippy_model.so
-  trace-log: /home/aliya/programming/cpp/RV32I_model/build/logfile.txt
+  trace-log: /home/aliya/programming/cpp/RV32I_model/build/snippy_model/logfile1.txt
   reserved-regs-list: [sp, gp, ra]
 
 sections:
