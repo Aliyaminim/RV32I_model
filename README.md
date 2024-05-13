@@ -11,18 +11,21 @@ cd build/
 cmake --build .
 ```
 
-## How to run the program
+## How to run the simulator
 ```bash
-./main [file]
+./rv32i_sim [file]
 ```
 As an example, you can use the prepared hello-world program:
 ```bash
-./main ../hello_test/hello.bin 
+./rv32i_sim ../hello_test/hello.bin 
 ```
 
 ## How to test the program
-Sorry, unit testing is down today due to new changes, but some tests are still passing. I will fix this asap.
 ```bash
 ./tests/unit_test 
 ```
+or use [llvm-snippy](https://github.com/syntacore/snippy)
+
+The dynamic library for snippy is located in ./build/snippy_model/libsnippy_model.so
+
 
