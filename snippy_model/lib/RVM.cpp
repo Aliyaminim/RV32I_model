@@ -4,10 +4,6 @@
 #include "RVM.h"
 #include "rv32i_model.hpp"
 
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
-
 class SnippyRISCVSimulator final {
     std::optional<std::ofstream> LogFile;
     rv32i_model::Processor proc;
@@ -39,6 +35,9 @@ public:
     ~SnippyRISCVSimulator() = default;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
 
 struct RVMState {
     RVMConfig Config;
