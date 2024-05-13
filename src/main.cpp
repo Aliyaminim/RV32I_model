@@ -8,11 +8,11 @@
 
 std::vector<uint32_t> get_memory_image(const char * filename) {
     if (!std::filesystem::is_regular_file(filename))
-        throw std::runtime_error (std::string("ERROR:\nCan't open file ") + std::string(filename));
+        throw std::runtime_error (std::string("ERROR:\nCan't open file ") + filename);
 
     std::ifstream binary_input{filename, std::ios::binary};
     if (!binary_input.is_open())
-        throw std::runtime_error (std::string("ERROR:\nCan't open file ") + std::string(filename));
+        throw std::runtime_error (std::string("ERROR:\nCan't open file ") + filename);
 
     std::vector<uint32_t> memory_image;
     uint32_t n;
