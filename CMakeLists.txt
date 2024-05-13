@@ -20,8 +20,8 @@ find_package(GTest REQUIRED)
 enable_testing()
 add_subdirectory(tests)
 
-add_executable(main ./src/main.cpp)
-target_include_directories(main PUBLIC ${CMAKE_SOURCE_DIR}/include)
+add_executable(rv32i_sim ./src/main.cpp)
+target_include_directories(rv32i_sim PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
 add_subdirectory(snippy_model)
 
