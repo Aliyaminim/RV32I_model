@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <endian.h>
+#include <cstring>
 #include <filesystem>
 #include <string>
 #include "rv32i_model.hpp"
@@ -16,7 +17,7 @@ std::vector<uint32_t> get_memory_image(const char * filename) {
 
     std::vector<uint32_t> memory_image;
     uint32_t n;
-    while(binary_input.read((char*)&n, sizeof(n))) {
+    while(binary_input.read(reinterpret_cast<char*>(&n), sizeof n )) {
         memory_image.push_back(le32toh(n));
         n = 0;
     }
@@ -29,8 +30,8 @@ std::vector<uint32_t> get_memory_image(const char * filename) {
 
 
 int main(int argc, char **argv) {
-    if (argc != 2) {
-        std::cerr << "ERROR:\nPlease enter: ./main <file>" << std::endl;
+    if (argc < 2 || argc > 3) {
+        std::cerr << "ERROR:\nPlease enter: ./rv32i_sim <inputfile> <logfile>" << std::endl;
         return 1;
     }
 
@@ -38,7 +39,7 @@ int main(int argc, char **argv) {
 
     try {
         std::size_t mem_size = (1ull << 32) - 1; //RV32I provides a 32-bit address space
-        std::ofstream logstream("logfile.out");
+        std::ofstream logstream(argv[2]);
         rv32i_model::Processor model_rv32i(mem_size, logstream);
 
         std::vector<uint32_t> memory_image = get_memory_image(argv[1]);
